@@ -1,0 +1,6 @@
+*.sh
+/build/
+/tests/
+phpunit.xml
+.idea/
+.DS_Store
