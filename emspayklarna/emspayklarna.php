@@ -1,39 +1,39 @@
 <?php
 
 use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
-use Lib\IngPspPaymentModule;
+use Lib\EmsPayPaymentModule;
 use Lib\Helper;
-use Model\Ingpsp\IngpspGateway;
-use Model\Ingpsp\Ingpsp;
-use Model\Customer\Customer as IngCustomer;
+use Model\Emspay\EmspayGateway;
+use Model\Emspay\Emspay;
+use Model\Customer\Customer as EmsCustomer;
 
 if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-require_once(_PS_MODULE_DIR_ . '/ingpsp/ingpsp_module_bootstrap.php');
+require_once(_PS_MODULE_DIR_ . '/emspay/emspay_module_bootstrap.php');
 
 
-class ingpspKlarna extends IngPspPaymentModule
+class emspayKlarna extends EmsPayPaymentModule
 {
     private $_html = '';
    
     public function __construct()
     {
-        $this->name = 'ingpspklarna';
+        $this->name = 'emspayklarna';
         $this->useDemoApiKey = true;
         parent::__construct();
-        $this->displayName = $this->l('ING PSP Klarna');
-        $this->description = $this->l('Accept payments for your products using ING PSP Klarna');
+        $this->displayName = $this->l('EMS PAY Klarna');
+        $this->description = $this->l('Accept payments for your products using EMS PAY Klarna');
     }
 
     public function install()
     {
-        if (!Module::isInstalled('ingpsp')) {
-            throw new PrestaShopException('The ingpsp extension is not installed, please install the ingpsp extension first and then the current extension.');
+        if (!Module::isInstalled('emspay')) {
+            throw new PrestaShopException('The emspay extension is not installed, please install the emspay extension first and then the current extension.');
         }
-        if (!Configuration::get('ING_PSP_APIKEY')) {
-            throw new PrestaShopException('The webshop API key is missing in the ingpsp extension. Please add the API Key in the ingpsp extension, save it & then re-install this extension.');
+        if (!Configuration::get('EMS_PAY_APIKEY')) {
+            throw new PrestaShopException('The webshop API key is missing in the emspay extension. Please add the API Key in the emspay extension, save it & then re-install this extension.');
         }
         if (!parent::install()
             || !$this->registerHook('paymentOptions')
@@ -53,7 +53,7 @@ class ingpspKlarna extends IngPspPaymentModule
         return true;
     }
 
-    private function _displayingpsp()
+    private function _displayemspay()
     {
         return $this->display(__FILE__, 'infos.tpl');
     }
@@ -66,7 +66,7 @@ class ingpspKlarna extends IngPspPaymentModule
             $this->_html .= '<br />';
         }
 
-        $this->_html .= $this->_displayingpsp();
+        $this->_html .= $this->_displayemspay();
         $this->_html .= $this->renderForm();
 
         return $this->_html;
@@ -75,7 +75,7 @@ class ingpspKlarna extends IngPspPaymentModule
     private function _postProcess()
     {
         if (Tools::isSubmit('btnSubmit')) {
-            Configuration::updateValue('ING_KLARNA_SHOW_FOR_IP', trim(Tools::getValue('ING_KLARNA_SHOW_FOR_IP')));
+            Configuration::updateValue('EMS_KLARNA_SHOW_FOR_IP', trim(Tools::getValue('EMS_KLARNA_SHOW_FOR_IP')));
         }
         $this->_html .= $this->displayConfirmation($this->l('Settings updated'));
     }
@@ -89,10 +89,10 @@ class ingpspKlarna extends IngPspPaymentModule
             return;
         }
 
-        // check if the ING_KLARNA_SHOW_FOR_IP is set, if so, only display if user is from that IP
-        $ing_klarna_show_for_ip = Configuration::get('ING_KLARNA_SHOW_FOR_IP');
-        if (strlen($ing_klarna_show_for_ip)) {
-            $ip_whitelist = array_map('trim', explode(",", $ing_klarna_show_for_ip));
+        // check if the EMS_KLARNA_SHOW_FOR_IP is set, if so, only display if user is from that IP
+        $ems_klarna_show_for_ip = Configuration::get('EMS_KLARNA_SHOW_FOR_IP');
+        if (strlen($ems_klarna_show_for_ip)) {
+            $ip_whitelist = array_map('trim', explode(",", $ems_klarna_show_for_ip));
             if (!in_array($_SERVER['REMOTE_ADDR'], $ip_whitelist)) {
                 return;
             }
@@ -133,8 +133,8 @@ class ingpspKlarna extends IngPspPaymentModule
             $this->smarty->smarty->assign('status', 'failed');
         }
         
-        $ingpsp = $this->getOrderFromDB($params['order']->id_cart);
-        $this->updateGingerOrder($ingpsp->getGingerOrderId(), $params['order']->id);
+        $emspay = $this->getOrderFromDB($params['order']->id_cart);
+        $this->updateGingerOrder($emspay->getGingerOrderId(), $params['order']->id);
 
         return $this->fetch('module:'.$this->name.'/views/templates/hook/payment_return.tpl');
     }
@@ -142,11 +142,11 @@ class ingpspKlarna extends IngPspPaymentModule
     
     public function hookActionOrderStatusUpdate($params)
     {
-        $ingpsp = (new IngpspGateway(Db::getInstance()))->getByCartId($params['cart']->id);
-        if ($this->isNewOrderStatusIsShipping($params, $ingpsp)) {
+        $emspay = (new EmspayGateway(Db::getInstance()))->getByCartId($params['cart']->id);
+        if ($this->isNewOrderStatusIsShipping($params, $emspay)) {
             try {
                 $this->ginger->setOrderCapturedStatus(
-                             $this->ginger->getOrder($ingpsp->getGingerOrderId())
+                             $this->ginger->getOrder($emspay->getGingerOrderId())
                              );
             } catch (\Exception $exception) {
                 Tools::displayError($exception->getMessage());
@@ -156,11 +156,11 @@ class ingpspKlarna extends IngPspPaymentModule
         return true;
     }
  
-    protected function isNewOrderStatusIsShipping($params, $ingpsp)
+    protected function isNewOrderStatusIsShipping($params, $emspay)
     {
         return (bool) (
-            $ingpsp !== null &&
-            $ingpsp->isKlarnaPaymentMethod() &&
+            $emspay !== null &&
+            $emspay->isKlarnaPaymentMethod() &&
             isset($params['newOrderStatus']) &&
             isset($params['newOrderStatus']->id) &&
             intval($params['newOrderStatus']->id) === intval(Configuration::get('PS_OS_SHIPPING'))
@@ -172,14 +172,14 @@ class ingpspKlarna extends IngPspPaymentModule
         $fields_form = array(
             'form' => array(
                 'legend' => array(
-                    'title' => $this->l('ING PSP Settings'),
+                    'title' => $this->l('EMS PAY Settings'),
                     'icon' => 'icon-envelope'
                 ),
                 'input' => array(
                     array(
                         'type' => 'text',
                         'label' => $this->l('IP address(es) for testing.'),
-                        'name' => 'ING_KLARNA_SHOW_FOR_IP',
+                        'name' => 'EMS_KLARNA_SHOW_FOR_IP',
                         'required' => true,
                         'desc' => $this->l('You can specify specific IP addresses for which Klarna is visible, for example if you want to test Klarna you can type IP addresses as 128.0.0.1, 255.255.255.255. If you fill in nothing, then, Klarna is visible to all IP addresses.'),
                     ),
@@ -216,9 +216,9 @@ class ingpspKlarna extends IngPspPaymentModule
     public function getConfigFieldsValues()
     {
         return array(
-            'ING_KLARNA_SHOW_FOR_IP' => Tools::getValue(
-                'ING_KLARNA_SHOW_FOR_IP',
-                Configuration::get('ING_KLARNA_SHOW_FOR_IP')
+            'EMS_KLARNA_SHOW_FOR_IP' => Tools::getValue(
+                'EMS_KLARNA_SHOW_FOR_IP',
+                Configuration::get('EMS_KLARNA_SHOW_FOR_IP')
             ),
         );
     }
@@ -269,14 +269,14 @@ class ingpspKlarna extends IngPspPaymentModule
             $this->context->customer->secure_key
         );
 
-        $ingpsp = new Ingpsp();
-        $ingpsp->setGingerOrderId($response->id()->toString())
+        $emspay = new Emspay();
+        $emspay->setGingerOrderId($response->id()->toString())
                 ->setIdCart($cart->id)
                 ->setKey($this->context->customer->secure_key)
                 ->setIdOrder($this->currentOrder)
                 ->setKlarnaPaymentMethod();
-        (new IngpspGateway(\Db::getInstance()))
-                    ->save($ingpsp);
+        (new EmspayGateway(\Db::getInstance()))
+                    ->save($emspay);
        
         $orderData = $this->ginger->getOrder($response->getId());
         $orderData->merchantOrderId($this->currentOrder);
@@ -292,7 +292,7 @@ class ingpspKlarna extends IngPspPaymentModule
         $presta_address = new Address((int) $cart->id_address_invoice);
         $presta_country = new Country((int) $presta_address->id_country);
           
-        return IngCustomer::createFromPrestaData(
+        return EmsCustomer::createFromPrestaData(
                     $presta_customer,
                     $presta_address,
                     $presta_country,

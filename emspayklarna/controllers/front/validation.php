@@ -3,20 +3,20 @@
 use Lib\GingerClientFactory;
 use Lib\GingerClientFactoryParams;
 
-require_once(_PS_MODULE_DIR_ . '/ingpsp/ingpsp_module_bootstrap.php');
+require_once(_PS_MODULE_DIR_ . '/emspay/emspay_module_bootstrap.php');
 
-class ingpspKlarnaValidationModuleFrontController extends ModuleFrontController 
+class emspayKlarnaValidationModuleFrontController extends ModuleFrontController
 {
 
     public function postProcess() 
     {
-        $apiKey = Configuration::get('ING_PSP_APIKEY_TEST') ?: Configuration::get('ING_PSP_APIKEY');
+        $apiKey = Configuration::get('EMS_PAY_APIKEY_TEST') ?: Configuration::get('EMS_PAY_APIKEY');
         $ginger = GingerClientFactory::create(
                     new GingerClientFactoryParams(
-                            'ingpsp', 
+                            'emspay',
                             $apiKey, 
-                            \Configuration::get('ING_PSP_PRODUCT'), 
-                            \Configuration::get('ING_PSP_BUNDLE_CA')
+                            \Configuration::get('EMS_PAY_PRODUCT'),
+                            \Configuration::get('EMS_PAY_BUNDLE_CA')
                     )
                 );
 
@@ -43,7 +43,7 @@ class ingpspKlarnaValidationModuleFrontController extends ModuleFrontController
                     'checkout_url' => $this->context->link->getPagelink('order')
                         )
                 );
-                $this->setTemplate('module:ingpsp/views/templates/front/error.tpl');
+                $this->setTemplate('module:emspay/views/templates/front/error.tpl');
                 break;
             default:
                 die("Should not happen");
