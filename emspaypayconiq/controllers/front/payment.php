@@ -1,8 +1,8 @@
 <?php
 
-require_once(_PS_MODULE_DIR_ . '/ingpsp/ingpsp_module_bootstrap.php');
+require_once(_PS_MODULE_DIR_ . '/emspay/emspay_module_bootstrap.php');
 
-class ingpspPayconiqPaymentModuleFrontController extends ModuleFrontController
+class emspayPayconiqPaymentModuleFrontController extends ModuleFrontController
 {
     public $ssl = true;
     public $display_column_left = false;
@@ -21,7 +21,7 @@ class ingpspPayconiqPaymentModuleFrontController extends ModuleFrontController
             );
             $this->context->smarty->assign('error_message', $errorMessage);
             $this->context->smarty->assign('template', _PS_THEME_DIR_ . 'templates/page.tpl');
-            $this->setTemplate('module:ingpsp/views/templates/front/error.tpl');
+            $this->setTemplate('module:emspay/views/templates/front/error.tpl');
         }
      
     }
