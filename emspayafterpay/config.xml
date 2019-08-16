@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <module>
-    <name>ingpspklarna</name>
-    <displayName><![CDATA[ING PSP AfterPay]]></displayName>
+    <name>emspayklarna</name>
+    <displayName><![CDATA[EMS PAY AfterPay]]></displayName>
     <version><![CDATA[1.1.1]]></version>
     <description><![CDATA[Accept payments in your webshop using Klarna.]]></description>
     <author><![CDATA[Ginger Payments]]></author>

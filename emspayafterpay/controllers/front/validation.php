@@ -1,8 +1,8 @@
 <?php
 
-require_once(_PS_MODULE_DIR_ . '/ingpsp/ingpsp_module_bootstrap.php');
+require_once(_PS_MODULE_DIR_ . '/emspay/emspay_module_bootstrap.php');
 
-class ingpspafterpayValidationModuleFrontController extends ModuleFrontController
+class emspayafterpayValidationModuleFrontController extends ModuleFrontController
 {
     public function postProcess()
     {
@@ -39,7 +39,7 @@ class ingpspafterpayValidationModuleFrontController extends ModuleFrontControlle
                 'error_message' => $e->getMessage()
             ]
         );
-        $this->setTemplate('module:ingpsp/views/templates/front/error.tpl');
+        $this->setTemplate('module:emspay/views/templates/front/error.tpl');
     }
     
     private function processCompletedStatus()
@@ -112,7 +112,7 @@ class ingpspafterpayValidationModuleFrontController extends ModuleFrontControlle
                 'shop_name' => \Configuration::get('PS_SHOP_NAME')
             ]
         );
-        $this->setTemplate('module:ingpsp/views/templates/front/error.tpl');
+        $this->setTemplate('module:emspay/views/templates/front/error.tpl');
     }
     
     /**
@@ -121,13 +121,13 @@ class ingpspafterpayValidationModuleFrontController extends ModuleFrontControlle
      */
     public function getOrderStatus()
     {
-        $apiKey = \Configuration::get('ING_PSP_AFTERPAY_APIKEY_TEST') ?: \Configuration::get('ING_PSP_APIKEY');
+        $apiKey = \Configuration::get('EMS_PAY_AFTERPAY_APIKEY_TEST') ?: \Configuration::get('EMS_PAY_APIKEY');
         $ginger = \Lib\GingerClientFactory::create(
                         new \Lib\GingerClientFactoryParams(
-                                'ingpsp',
+                                'emspay',
                                 $apiKey,
-                                \Configuration::get('ING_PSP_PRODUCT'),
-                                \Configuration::get('ING_PSP_BUNDLE_CA')
+                                \Configuration::get('EMS_PAY_PRODUCT'),
+                                \Configuration::get('EMS_PAY_BUNDLE_CA')
                         )
                 );
 
