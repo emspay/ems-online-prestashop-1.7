@@ -2,19 +2,19 @@
 use Lib\GingerClientFactory;
 use Lib\GingerClientFactoryParams;
 
-require_once(_PS_MODULE_DIR_ . '/ingpsp/ingpsp_module_bootstrap.php');
+require_once(_PS_MODULE_DIR_ . '/emspay/emspay_module_bootstrap.php');
 
-class ingpspBanktransferValidationModuleFrontController extends ModuleFrontController 
+class emspayBanktransferValidationModuleFrontController extends ModuleFrontController
 {
 
     public function postProcess() {
         
         $ginger = GingerClientFactory::create(
                 new GingerClientFactoryParams(
-                        'ingpsp', 
-                        \Configuration::get('ING_PSP_APIKEY'), 
-                        \Configuration::get('ING_PSP_PRODUCT'),
-                        \Configuration::get('ING_PSP_BUNDLE_CA')
+                        'emspay',
+                        \Configuration::get('EMS_PAY_APIKEY'),
+                        \Configuration::get('EMS_PAY_PRODUCT'),
+                        \Configuration::get('EMS_PAY_BUNDLE_CA')
                         )
                 );
 

@@ -1,33 +1,33 @@
 <?php
 
 use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
-use Lib\IngPspPaymentModule;
+use Lib\EmsPayPaymentModule;
 use Lib\Helper;
-use Model\Customer\Customer as IngCustomer;
+use Model\Customer\Customer as EmsCustomer;
 
 if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-require_once(_PS_MODULE_DIR_ . '/ingpsp/ingpsp_module_bootstrap.php');
+require_once(_PS_MODULE_DIR_ . '/emspay/emspay_module_bootstrap.php');
 
-class ingpspBanktransfer extends IngPspPaymentModule
+class emspayBanktransfer extends EmsPayPaymentModule
 {
     public function __construct()
     {
-        $this->name = 'ingpspbanktransfer';
+        $this->name = 'emspaybanktransfer';
         parent::__construct();
-        $this->displayName = $this->l('ING PSP Banktransfer');
-        $this->description = $this->l('Accept payments for your products using ING PSP Banktransfer');
+        $this->displayName = $this->l('EMS PAY Banktransfer');
+        $this->description = $this->l('Accept payments for your products using EMS PAY Banktransfer');
     }
 
     public function install()
     {
-        if (!Module::isInstalled('ingpsp')) {
-            throw new PrestaShopException('The ingpsp extension is not installed, please install the ingpsp extension first and then the current extension.');
+        if (!Module::isInstalled('emspay')) {
+            throw new PrestaShopException('The emspay extension is not installed, please install the emspay extension first and then the current extension.');
         }
-        if (!Configuration::get('ING_PSP_APIKEY')) {
-            throw new PrestaShopException('The webshop API key is missing in the ingpsp extension. Please add the API Key in the ingpsp extension, save it & then re-install this extension.');
+        if (!Configuration::get('EMS_PAY_APIKEY')) {
+            throw new PrestaShopException('The webshop API key is missing in the emspay extension. Please add the API Key in the emspay extension, save it & then re-install this extension.');
         }
         if (!parent::install()
                 || !$this->registerHook('paymentOptions')
@@ -81,14 +81,14 @@ class ingpspBanktransfer extends IngPspPaymentModule
                     Configuration::get('PS_OS_OUTOFSTOCK'),
                     Configuration::get('PS_OS_OUTOFSTOCK_UNPAID')
                 ))) {
-            $ingpsp = $this->getOrderFromDB($params['order']->id_cart);
+            $emspay = $this->getOrderFromDB($params['order']->id_cart);
             $this->context->smarty->assign(array(
                 'total_to_pay' => Tools::displayPrice($params['order']->getOrdersTotalPaid(), new Currency($params['order']->id_currency), false),
                 'gingerbanktransferIBAN' => 'NL13INGB0005300060',
                 'gingerbanktransferAddress' => '',
-                'gingerbanktransferOwner' => 'ING PSP',
+                'gingerbanktransferOwner' => 'EMS PAY',
                 'status' => 'ok',
-                'reference' => $ingpsp->getReference(),
+                'reference' => $emspay->getReference(),
                 'shop_name' => strval(Configuration::get('PS_SHOP_NAME'))
             ));
         } else {
@@ -103,7 +103,7 @@ class ingpspBanktransfer extends IngPspPaymentModule
         $presta_address = new Address((int) $cart->id_address_invoice);
         $presta_country = new Country((int) $presta_address->id_country);
 
-        $customer = IngCustomer::createFromPrestaData(
+        $customer = EmsCustomer::createFromPrestaData(
                     $presta_customer,
                     $presta_address,
                     $presta_country,
@@ -146,7 +146,7 @@ class ingpspBanktransfer extends IngPspPaymentModule
         $bankReference = $response->transactions()->current()->paymentMethodDetails()->reference()->toString();
 
         $extra_vars = array(
-            '{bankwire_owner}' => "ING PSP",
+            '{bankwire_owner}' => "EMS PAY",
             '{bankwire_details}' => "NL13INGB0005300060",
             '{bankwire_address}' => $this->l('Use the following reference when paying for your order:') . " " . $bankReference,
         );
@@ -163,7 +163,7 @@ class ingpspBanktransfer extends IngPspPaymentModule
             $this->context->customer->secure_key
         );
 
-        $this->saveINGOrderId($response, $cart->id, $this->context->customer->secure_key, $this->name, $this->currentOrder, $response->transactions()->current()->paymentMethodDetails()->reference()->toString());
+        $this->saveEMSOrderId($response, $cart->id, $this->context->customer->secure_key, $this->name, $this->currentOrder, $response->transactions()->current()->paymentMethodDetails()->reference()->toString());
         $this->_updateOrder($response->getId());
         $this->sendPrivateMessage($bankReference);
 
@@ -183,7 +183,7 @@ class ingpspBanktransfer extends IngPspPaymentModule
     public function sendPrivateMessage($bankReference)
     {
         $new_message = new Message();
-        $new_message->message = $this->l('ING PSP Bank Transfer Reference: ') . $bankReference;
+        $new_message->message = $this->l('EMS PAY Bank Transfer Reference: ') . $bankReference;
         $new_message->id_order = $this->currentOrder;
         $new_message->private = 1;
         $new_message->add();
