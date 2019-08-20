@@ -2,20 +2,15 @@
 
 global $_MODULE;
 $_MODULE = array();
-$_MODULE['<{emspaybanktransfer}prestashop>emspaybanktransfer_e45937a38f1bc7cfd7b75621cb14cae1'] = 'EMS PAY Bank Transfer';
-$_MODULE['<{emspaybanktransfer}prestashop>emspaybanktransfer_42ffd5610caeb3a3669cc32d3c37f98b'] = 'Accept payments in your webshop using  Bank Transfer.';
-$_MODULE['<{emspaybanktransfer}prestashop>emspaybanktransfer_cbe0a99684b145e77f3e14174ac212e3'] = 'Are you sure about removing these details?';
-$_MODULE['<{emspaybanktransfer}prestashop>emspaybanktransfer_a02758d758e8bec77a33d7f392eb3f8a'] = 'No currency has been set for this module. Please configure this in the Localizations menu/Currencies section.';
+$_MODULE['<{emspaybanktransfer}prestashop>emspaybanktransfer_e7ec7bf7d9dc25c33b09f6ea03905fb3'] = 'EMS Online Banktransfer';
+$_MODULE['<{emspaybanktransfer}prestashop>emspaybanktransfer_e103c52e308e5e3b705906aa73165388'] = 'Accept payments in your webshop using EMS Online Bank Transfer.';
 $_MODULE['<{emspaybanktransfer}prestashop>emspaybanktransfer_572b221ec653032250100cefd10a31eb'] = 'Pay by Bank Transfer';
-$_MODULE['<{emspaybanktransfer}prestashop>emspaybanktransfer_7853e11acea9a6109b2f1c00cdb4041e'] = 'Your order at';
 $_MODULE['<{emspaybanktransfer}prestashop>emspaybanktransfer_0d8a5a85d378a2c248326eac1b045556'] = 'Use the following reference when paying for your order:';
-$_MODULE['<{emspaybanktransfer}prestashop>emspaybanktransfer_d438503a23d967ac1bfbeee3e174bca0'] = 'Bank Transfer Reference :';
-$_MODULE['<{emspaybanktransfer}prestashop>error_68a489dbc8079a40832c3d558fcfb069'] = ' Your order at %s';
+$_MODULE['<{emspaybanktransfer}prestashop>emspaybanktransfer_218fa8ba064e0a843fb30108aeef5562'] = 'EMS Online Bank Transfer Reference:';
 $_MODULE['<{emspaybanktransfer}prestashop>error_5023dbc72719b0d03162a18fda6db2b3'] = 'There was an error processing your order. We apologize for the inconvenience.';
 $_MODULE['<{emspaybanktransfer}prestashop>error_7dc1ee1a41f69f4027a773780c058b07'] = 'Please click here to choose another payment method.';
 $_MODULE['<{emspaybanktransfer}prestashop>error_34e0a062726d06e24047764c3bef28c0'] = 'Please click here to try again.';
 $_MODULE['<{emspaybanktransfer}prestashop>error_b260f74ed85604be0f0381ce059f6b44'] = 'Go back to the checkout page.';
-$_MODULE['<{emspaybanktransfer}prestashop>payment_0afd6d0687be21f6cd46d159aa130db4'] = 'Pay by Bank Transfer';
 $_MODULE['<{emspaybanktransfer}prestashop>payment_return_68a489dbc8079a40832c3d558fcfb069'] = ' Your order at %s';
 $_MODULE['<{emspaybanktransfer}prestashop>payment_return_39e50761df1515cf368f1242a61a81bd'] = 'The status of your order at %s could not be determined.';
 $_MODULE['<{emspaybanktransfer}prestashop>payment_return_60cc46d58b23f7b478ffcc73ed70ae57'] = 'Your order at %s is pending.';
