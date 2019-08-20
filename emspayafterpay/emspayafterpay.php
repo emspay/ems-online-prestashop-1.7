@@ -27,8 +27,8 @@ class emspayAfterpay extends EmsPayPaymentModule
         $this->name = 'emspayafterpay';
         $this->useDemoApiKey = true;
         parent::__construct();
-        $this->displayName = $this->l('EMS PAY AfterPay');
-        $this->description = $this->l('Accept payments for your products using EMS PAY AfterPay');
+        $this->displayName = $this->l('EMS Online AfterPay');
+        $this->description = $this->l('Accept payments for your products using EMS Online AfterPay');
     }
 
     public function install()
@@ -95,7 +95,7 @@ class emspayAfterpay extends EmsPayPaymentModule
         $fields_form = array(
             'form' => array(
                 'legend' => array(
-                    'title' => $this->l('EMS PAY Settings'),
+                    'title' => $this->l('EMS Online Settings'),
                     'icon' => 'icon-envelope'
                 ),
                 'input' => array(

@@ -17,7 +17,7 @@ class emspaypaypal extends EmsPayPaymentModule
     {
         $this->name = 'emspaypaypal';
         parent::__construct();
-        $this->displayName = $this->l('EMS PAY PayPal');
+        $this->displayName = $this->l('EMS Online PayPal');
         $this->description = $this->l('Accept payments for your products using PayPal.');
     }
 

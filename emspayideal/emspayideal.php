@@ -17,8 +17,8 @@ class emspayIdeal extends EmsPayPaymentModule
     {
         $this->name = 'emspayideal';
         parent::__construct();
-        $this->displayName = $this->l('EMS PAY iDEAL');
-        $this->description = $this->l('Accept payments for your products using EMS PAY iDEAL.');
+        $this->displayName = $this->l('EMS Online iDEAL');
+        $this->description = $this->l('Accept payments for your products using EMS Online iDEAL.');
     }
     
     public function install()

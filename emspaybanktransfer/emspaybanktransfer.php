@@ -17,8 +17,8 @@ class emspayBanktransfer extends EmsPayPaymentModule
     {
         $this->name = 'emspaybanktransfer';
         parent::__construct();
-        $this->displayName = $this->l('EMS PAY Banktransfer');
-        $this->description = $this->l('Accept payments for your products using EMS PAY Banktransfer');
+        $this->displayName = $this->l('EMS Online Banktransfer');
+        $this->description = $this->l('Accept payments for your products using EMS Online Banktransfer');
     }
 
     public function install()
@@ -84,9 +84,9 @@ class emspayBanktransfer extends EmsPayPaymentModule
             $emspay = $this->getOrderFromDB($params['order']->id_cart);
             $this->context->smarty->assign(array(
                 'total_to_pay' => Tools::displayPrice($params['order']->getOrdersTotalPaid(), new Currency($params['order']->id_currency), false),
-                'gingerbanktransferIBAN' => 'NL13INGB0005300060',
+                'gingerbanktransferIBAN' => 'NL79ABNA0842577610',
                 'gingerbanktransferAddress' => '',
-                'gingerbanktransferOwner' => 'EMS PAY',
+                'gingerbanktransferOwner' => 'THIRD PARTY FUNDS EMS',
                 'status' => 'ok',
                 'reference' => $emspay->getReference(),
                 'shop_name' => strval(Configuration::get('PS_SHOP_NAME'))
@@ -146,7 +146,7 @@ class emspayBanktransfer extends EmsPayPaymentModule
         $bankReference = $response->transactions()->current()->paymentMethodDetails()->reference()->toString();
 
         $extra_vars = array(
-            '{bankwire_owner}' => "EMS PAY",
+            '{bankwire_owner}' => "THIRD PARTY FUNDS EMS",
             '{bankwire_details}' => "NL79ABNA0842577610",
             '{bankwire_address}' => $this->l('Use the following reference when paying for your order:') . " " . $bankReference,
         );
@@ -183,7 +183,7 @@ class emspayBanktransfer extends EmsPayPaymentModule
     public function sendPrivateMessage($bankReference)
     {
         $new_message = new Message();
-        $new_message->message = $this->l('EMS PAY Bank Transfer Reference: ') . $bankReference;
+        $new_message->message = $this->l('EMS Online Bank Transfer Reference: ') . $bankReference;
         $new_message->id_order = $this->currentOrder;
         $new_message->private = 1;
         $new_message->add();

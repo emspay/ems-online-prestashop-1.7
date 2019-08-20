@@ -19,7 +19,7 @@ class emspaybancontact extends EmsPayPaymentModule
 
         parent::__construct();
 
-        $this->displayName = $this->l('EMS PAY Bancontact');
+        $this->displayName = $this->l('EMS Online Bancontact');
         $this->description = $this->l('Accept payments for your products using Bancontact.');
     }
 

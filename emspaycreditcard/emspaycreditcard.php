@@ -17,7 +17,7 @@ class emspayCreditcard extends EmsPayPaymentModule
     {
         $this->name = 'emspaycreditcard';
         parent::__construct();
-        $this->displayName = $this->l('EMS PAY Creditcard');
+        $this->displayName = $this->l('EMS Online Creditcard');
         $this->description = $this->l('Accept payments for your products using creditcard.');
     }
 

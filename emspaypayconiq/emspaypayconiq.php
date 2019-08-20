@@ -17,7 +17,7 @@ class emspayPayconiq extends EmsPayPaymentModule
     {
         $this->name = 'emspaypayconiq';
         parent::__construct();
-        $this->displayName = $this->l('EMS PAY Payconiq');
+        $this->displayName = $this->l('EMS Online Payconiq');
         $this->description = $this->l('Accept payments for your products using Payconiq.');
     }
     

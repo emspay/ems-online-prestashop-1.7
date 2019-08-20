@@ -17,7 +17,7 @@ class emspaysofort extends EmsPayPaymentModule
     {
         $this->name = 'emspaysofort';
         parent::__construct();
-        $this->displayName = $this->l('EMS PAY SOFORT');
+        $this->displayName = $this->l('EMS Online SOFORT');
         $this->description = $this->l('Accept payments for your products using SOFORT.');
     }
 

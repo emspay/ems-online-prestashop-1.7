@@ -23,8 +23,8 @@ class emspayKlarna extends EmsPayPaymentModule
         $this->name = 'emspayklarna';
         $this->useDemoApiKey = true;
         parent::__construct();
-        $this->displayName = $this->l('EMS PAY Klarna');
-        $this->description = $this->l('Accept payments for your products using EMS PAY Klarna');
+        $this->displayName = $this->l('EMS Online Klarna');
+        $this->description = $this->l('Accept payments for your products using EMS Online Klarna');
     }
 
     public function install()
@@ -172,7 +172,7 @@ class emspayKlarna extends EmsPayPaymentModule
         $fields_form = array(
             'form' => array(
                 'legend' => array(
-                    'title' => $this->l('EMS PAY Settings'),
+                    'title' => $this->l('EMS Online Settings'),
                     'icon' => 'icon-envelope'
                 ),
                 'input' => array(
