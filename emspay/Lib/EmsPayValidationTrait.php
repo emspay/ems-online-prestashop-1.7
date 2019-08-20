@@ -105,7 +105,6 @@ trait EmsPayValidationTrait
                         new GingerClientFactoryParams(
                                 'emspay',
                                 \Configuration::get('EMS_PAY_APIKEY'),
-                                \Configuration::get('EMS_PAY_PRODUCT'),
                                 \Configuration::get('EMS_PAY_BUNDLE_CA')
                         )
                 );

@@ -14,8 +14,7 @@ class emspayKlarnaValidationModuleFrontController extends ModuleFrontController
         $ginger = GingerClientFactory::create(
                     new GingerClientFactoryParams(
                             'emspay',
-                            $apiKey, 
-                            \Configuration::get('EMS_PAY_PRODUCT'),
+                            $apiKey,
                             \Configuration::get('EMS_PAY_BUNDLE_CA')
                     )
                 );

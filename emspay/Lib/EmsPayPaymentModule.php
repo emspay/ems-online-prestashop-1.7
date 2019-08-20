@@ -50,7 +50,6 @@ abstract class EmsPayPaymentModule extends \PaymentModule
                     new GingerClientFactoryParams(
                             self::PLUGIN_TYPE,
                             $apiKey,
-                            \Configuration::get('EMS_PAY_PRODUCT'),
                             \Configuration::get('EMS_PAY_BUNDLE_CA')
                             )
                     );

@@ -9,10 +9,9 @@ class GingerClientFactoryParams {
     private $product;
     private $bundleCa;
 
-    public function __construct($clientType, $apiKey, $product, $bundleCa) {
+    public function __construct($clientType, $apiKey, $bundleCa) {
         $this->clientType = $clientType;
         $this->apiKey = $apiKey;
-        $this->product = $product;
         $this->bundleCa = $bundleCa;
     }
 
@@ -22,10 +21,6 @@ class GingerClientFactoryParams {
 
     public function getApiKey() {
         return $this->apiKey;
-    }
-
-    public function getProduct() {
-        return $this->product;
     }
 
     public function getBundleCa() {

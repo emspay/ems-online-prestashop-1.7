@@ -126,7 +126,6 @@ class emspayafterpayValidationModuleFrontController extends ModuleFrontControlle
                         new \Lib\GingerClientFactoryParams(
                                 'emspay',
                                 $apiKey,
-                                \Configuration::get('EMS_PAY_PRODUCT'),
                                 \Configuration::get('EMS_PAY_BUNDLE_CA')
                         )
                 );

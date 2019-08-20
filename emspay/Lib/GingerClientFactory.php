@@ -20,9 +20,7 @@ class GingerClientFactory {
                         throw new \InvalidArgumentException('APIKEY is not provided');
                     }
 
-                    $ginger = \GingerPayments\Payment\Ginger::createClient(
-                                    $params->getApiKey(), $params->getProduct()
-                    );
+                    $ginger = \GingerPayments\Payment\Ginger::createClient( $params->getApiKey());
                     if (null !== $params->getBundleCa()) {
                         $ginger->useBundledCA();
                     }
