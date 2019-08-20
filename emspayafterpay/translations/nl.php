@@ -2,7 +2,7 @@
 
 global $_MODULE;
 $_MODULE = array();
-$_MODULE['<{emspayafterpay}prestashop>emspayafterpay_198c24be6d3d9f23cad9ae032b2c4351'] = 'EMS PAY AfterPay';
+$_MODULE['<{emspayafterpay}prestashop>emspayafterpay_198c24be6d3d9f23cad9ae032b2c4351'] = 'EMS Online AfterPay';
 $_MODULE['<{emspayafterpay}prestashop>emspayafterpay_04700e46bee5253f8bc10e587caa8c7f'] = 'Met deze module kunt u AfterPay betalingen accepteren.';
 $_MODULE['<{emspayafterpay}prestashop>emspayafterpay_c888438d14855d7d96a2724ee9c306bd'] = 'Instellingen aangepast';
 $_MODULE['<{emspayafterpay}prestashop>emspayafterpay_09b61a6273a9e570a8b89cf6a9cc4376'] = 'EMS Online Instellingen';

@@ -2,7 +2,7 @@
 
 global $_MODULE;
 $_MODULE = array();
-$_MODULE['<{emspaybancontact}prestashop>emspaybancontact_b4f4c9a97d82c0c6c0d4f4d2c9ba2c21'] = 'EMS PAY Bancontact';
+$_MODULE['<{emspaybancontact}prestashop>emspaybancontact_b4f4c9a97d82c0c6c0d4f4d2c9ba2c21'] = 'EMS Online Bancontact';
 $_MODULE['<{emspaybancontact}prestashop>emspaybancontact_97348bde8427d75a39530b746a85219f'] = 'Met deze module kunt u Bancontact betalingen accepteren.';
 $_MODULE['<{emspaybancontact}prestashop>emspaybancontact_d536f6cb1304cde5da44c530d3157886'] = 'Betalen met  Bancontact';
 $_MODULE['<{emspaybancontact}prestashop>payment_error_5023dbc72719b0d03162a18fda6db2b3'] = 'Helaas is er een fout opgetreden tijdens het verwerken van uw betaling. Onze excuses voor het ongemak.';
