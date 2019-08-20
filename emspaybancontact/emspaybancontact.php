@@ -103,7 +103,7 @@ class emspaybancontact extends EmsPayPaymentModule
             return Tools::displayError("Error: Response did not include payment url!");
         }
 
-        $this->saveINGOrderId($response, $cart->id, $this->context->customer->secure_key, $this->name);
+        $this->saveEMSOrderId($response, $cart->id, $this->context->customer->secure_key, $this->name);
 
         Tools::redirect($response->firstTransactionPaymentUrl()->toString());
     }
