@@ -444,6 +444,46 @@ final class Order
             $webhookUrl
         );
     }
+
+    /**
+     * Create a new Order with the Apple Pay payment method.
+     *
+     * @param $amount
+     * @param $currency
+     * @param null $description
+     * @param null $merchantOrderId
+     * @param null $returnUrl
+     * @param null $expirationPeriod
+     * @param null $customer
+     * @param null $extra
+     * @param null $webhookUrl
+     * @return Order
+     */
+    public static function createWithApplePay(
+        $amount,
+        $currency,
+        $description = null,
+        $merchantOrderId = null,
+        $returnUrl = null,
+        $expirationPeriod = null,
+        $customer = null,
+        $extra = null,
+        $webhookUrl = null
+    ) {
+        return static::create(
+            $amount,
+            $currency,
+            PaymentMethod::APPLE_PAY,
+            [],
+            $description,
+            $merchantOrderId,
+            $returnUrl,
+            $expirationPeriod,
+            $customer,
+            $extra,
+            $webhookUrl
+);
+}
     
     /**
      * @param integer $amount Amount in cents.
