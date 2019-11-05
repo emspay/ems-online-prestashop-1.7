@@ -20,7 +20,7 @@ final class PaymentMethod
     const PAYPAL = 'paypal';
     const PAYCONIQ = 'payconiq';
     const AFTERPAY = 'afterpay';
-    const APPLE_PAY = 'applepay';
+    const APPLE_PAY = 'apple-pay';
     /**
      * @return array
      */

@@ -68,7 +68,6 @@ class emspayApplePay extends EmsPayPaymentModule
         $paymentOption->setModuleName($this->name);
         return [$paymentOption];
     }
-
     public function execPayment($cart, $locale = '')
     {
         $customer = $this->_createCustomer($cart, $locale);

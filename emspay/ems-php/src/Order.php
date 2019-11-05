@@ -446,7 +446,7 @@ final class Order
     }
 
     /**
-     * Create a new Order with the Apple Pay payment method.
+     * Create a new Order with the Apple Pay6 payment method.
      *
      * @param $amount
      * @param $currency

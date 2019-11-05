@@ -170,7 +170,7 @@ class emspayAfterpay extends EmsPayPaymentModule
 
         $paymentOption = new PaymentOption;
         $paymentOption->setCallToActionText($this->l('Pay by AfterPay'));
-        $paymentOption->setLogo(Media::getMediaPath(dirname(__FILE__) . '/logo_bestelling.png'));
+        $paymentOption->setLogo(Media::getMediaPath(dirname(__FILE__) . '/emspayapplepay.png'));
         $paymentOption->setAction($this->context->link->getModuleLink($this->name, 'payment'));
         $paymentOption->setModuleName($this->name);
         $userCountry = $this->getUserCountryFromAddressId($params['cart']->id_address_invoice);
