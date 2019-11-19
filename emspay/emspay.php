@@ -20,6 +20,7 @@ class emspay extends PaymentModule
         'banktransfer',
         'creditcard',
         'bancontact',
+        'applepay',
     ];
 
     public function __construct()
