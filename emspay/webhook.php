@@ -9,7 +9,7 @@ $payment_method_mapping = array(
     "sofort" => "SOFORT",
     "klarna" => "Klarna",
     "paypal" => "PayPal",
-    "applepay" => "ApplePay",
+    "applepay" => "Apple Pay",
 );
 
 $input = json_decode(file_get_contents("php://input"), true);
