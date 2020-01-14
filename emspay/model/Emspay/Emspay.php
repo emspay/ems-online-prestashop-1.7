@@ -17,7 +17,7 @@ class Emspay {
     private $payment_method;
     private $reference;
     
-    const PAYMENT_METHOD_KLARNA = 'emspayklarna';
+    const PAYMENT_METHOD_KLARNA_PAY_LATER = 'emspayklarnapaylater';
     const PAYMENT_METHOD_AFTERPAY = 'emspayafterpay';
 
     public function getId() {
@@ -80,14 +80,14 @@ class Emspay {
         return $this;
     }
     
-    public function isKlarnaPaymentMethod() 
+    public function isKlarnaPayLaterPaymentMethod()
     {
-        return $this->payment_method === self::PAYMENT_METHOD_KLARNA;
+        return $this->payment_method === self::PAYMENT_METHOD_KLARNA_PAY_LATER;
     }
     
-    public function setKlarnaPaymentMethod() 
+    public function setKlarnaPayLaterPaymentMethod()
     {
-        $this->payment_method = static::PAYMENT_METHOD_KLARNA;
+        $this->payment_method = static::PAYMENT_METHOD_KLARNA_PAY_LATER;
     }
     
     public function isAfterPayPaymentMethod() 
