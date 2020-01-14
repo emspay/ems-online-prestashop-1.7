@@ -20,9 +20,9 @@
 <div class="row">
     <div class="col-xs-12">
         <p class="payment_module">
-            <a class="emspayklarnapaylater" href="{$link->getModuleLink('emspayklarnapaylaterpaylater', 'payment')|escape:'html'}"
-               title="{l s='Pay by Klarna Pay Later' mod='emspayklarnapaylaterpaylater'}">
-                {l s='Pay by Klarna Pay Later' mod='emspayklarnapaylaterpaylater'}
+            <a class="emspayklarnapaylater" href="{$link->getModuleLink('emsklarnapaylater', 'payment')|escape:'html'}"
+               title="{l s='Pay by Klarna Pay Later' mod='emspayklarnapaylater'}">
+                {l s='Pay by Klarna Pay Later' mod='emspayklarnapaylater'}
             </a>
         </p>
     </div>
