@@ -11,14 +11,14 @@ if (!defined('_PS_VERSION_')) {
 
 require_once(_PS_MODULE_DIR_ . '/emspay/emspay_module_bootstrap.php');
 
-class emspaysofort extends EmsPayPaymentModule
+class emspayklarnapaynow extends EmsPayPaymentModule
 {
     public function __construct()
     {
-        $this->name = 'emspaysofort';
+        $this->name = 'emspayklarnapaynow';
         parent::__construct();
-        $this->displayName = $this->l('EMS Online SOFORT');
-        $this->description = $this->l('Accept payments for your products using SOFORT.');
+        $this->displayName = $this->l('EMS Online Klarna Pay Now');
+        $this->description = $this->l('Accept payments for your products using Klarna Pay Now.');
     }
 
     public function install()
@@ -62,7 +62,7 @@ class emspaysofort extends EmsPayPaymentModule
         ));
 
         $paymentOption = new PaymentOption;
-        $paymentOption->setCallToActionText($this->l('Pay by SOFORT'));
+        $paymentOption->setCallToActionText($this->l('Pay by Klarna Pay Now'));
         $paymentOption->setLogo(Media::getMediaPath(dirname(__FILE__) . '/'.$this->name.'.png'));
         $paymentOption->setAction($this->context->link->getModuleLink($this->name, 'payment'));
         $paymentOption->setModuleName($this->name);
@@ -73,7 +73,7 @@ class emspaysofort extends EmsPayPaymentModule
     {
         $customerObj = $this->_createCustomer($cart, $locale);
         try {
-            $response = $this->ginger->createSofortOrder(
+            $response = $this->ginger->createKlarnaPayNowOrder(
                 Helper::getAmountInCents($cart->getOrderTotal(true)),     // Amount in cents
                 $this->getPaymentCurrency(),                              // Currency
                 [],

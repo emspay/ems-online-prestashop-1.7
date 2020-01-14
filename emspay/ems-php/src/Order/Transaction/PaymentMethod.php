@@ -14,8 +14,8 @@ final class PaymentMethod
     const IDEAL = 'ideal';
     const CREDIT_CARD = 'credit-card';
     const BANK_TRANSFER = 'bank-transfer';
-    const SOFORT = 'sofort';
     const BANCONTACT = 'bancontact';
+    const KLARNA_PAY_NOW = 'klarna-pay-now';
     const KLARNA_PAY_LATER = 'klarna-pay-later';
     const PAYPAL = 'paypal';
     const PAYCONIQ = 'payconiq';
@@ -30,8 +30,8 @@ final class PaymentMethod
             self::IDEAL,
             self::CREDIT_CARD,
             self::BANK_TRANSFER,
-            self::SOFORT,
             self::BANCONTACT,
+            self::KLARNA_PAY_NOW,
             self::KLARNA_PAY_LATER,
             self::PAYPAL,
             self::PAYCONIQ,
@@ -75,9 +75,9 @@ final class PaymentMethod
     /**
      * @return bool
      */
-    public function isSofort()
+    public function isKlarnaPayNow()
     {
-        return $this->value === self::SOFORT;
+        return $this->value === self::KLARNA_PAY_NOW;
     }
 
     /**
