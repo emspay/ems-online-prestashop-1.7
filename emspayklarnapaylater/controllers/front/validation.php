@@ -24,6 +24,7 @@ class emspayKlarnaPayLaterValidationModuleFrontController extends ModuleFrontCon
 
         switch ($ginger_order_status) {
             case 'processing':
+            case 'new':
             case 'completed':
                 if (isset($cart_id)) {
                     Tools::redirect(
