@@ -17,7 +17,7 @@ abstract class EmsPayPaymentModule extends \PaymentModule
     protected $useDemoApiKey = false;
 
     const PLUGIN_TYPE = 'emspay';
-    const EMSPAY_KLARNA_PLUGIN_NAME   = 'emspayklarna';
+    const EMSPAY_KLARNA_PLUGIN_NAME   = 'emspayklarnapaylater';
     const EMSPAY_AFTERPAY_PLUGIN_NAME = 'emspayafterpay';
 
     public function __construct()
