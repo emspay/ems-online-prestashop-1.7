@@ -6,10 +6,15 @@ $payment_method_mapping = array(
     "ideal" => "iDEAL",
     "credit-card" => "Creditcard",
     "bancontact" => "Bancontact",
-    "sofort" => "SOFORT",
-    "klarna" => "Klarna",
+    "klarna-pay-later" => "Klarna Pay Later",
+    "klarna-pay-now" => "Klarna Pay Now",
+    "apple-pay" => "Apple Pay",
+    "afterpay" => "Afterpay",
+    "amex" => "American Express",
+    "payconiq" => "Payconiq",
     "paypal" => "PayPal",
-    "applepay" => "Apple Pay",
+    "tikkie-fast-checkout" => "Tikkie Fast Checkout",
+    "wechat" => "WeChat"
 );
 
 $input = json_decode(file_get_contents("php://input"), true);
@@ -39,8 +44,7 @@ include dirname(__FILE__).'/../'.$row['payment_method'].'/'.$row['payment_method
 
 $emspay = new $row['payment_method']();
 
-$emspayOrder = $emspay->ginger()->getOrder($ginger_order_id);
-$order_details = $emspayOrder->toArray();
+$order_details = $emspay->ginger()->getOrder($ginger_order_id);
 
 echo "WEBHOOK: Found status: ".$order_details['status']."\n";
 
@@ -84,7 +88,6 @@ if ($order_details['status'] == "completed") {
         Db::getInstance()->update('emspay', array("id_order" => $id_order),
             '`ginger_order_id` = "'.Db::getInstance()->escape($ginger_order_id).'"');
 
-        $emspayOrder->merchantOrderId($id_order);
-        $emspay->ginger()->updateOrder($emspayOrder);
+	  $emspay->ginger()->updateOrder($ginger_order_id, $order_details);
     }
 }

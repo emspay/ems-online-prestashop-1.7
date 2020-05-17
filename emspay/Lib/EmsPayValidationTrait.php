@@ -108,8 +108,9 @@ trait EmsPayValidationTrait
                                 \Configuration::get('EMS_PAY_BUNDLE_CA')
                         )
                 );
+	  $order = $ginger->getOrder($orderId);
 
-        return $ginger->getOrder($orderId)->getStatus();
+        return $order['status'];
     }
             
 }

@@ -1,5 +1,6 @@
 <?php
 
+use PrestaShop\PrestaShop\Core\Addon\Module\ModuleManagerBuilder;
 use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
 use Lib\EmsPayPaymentModule;
 use Lib\Helper;
@@ -16,6 +17,7 @@ class emspayIdeal extends EmsPayPaymentModule
     public function __construct()
     {
         $this->name = 'emspayideal';
+	  $this->method_id = 'ideal';
         parent::__construct();
         $this->displayName = $this->l('EMS Online iDEAL');
         $this->description = $this->l('Accept payments for your products using EMS Online iDEAL.');
@@ -83,7 +85,7 @@ class emspayIdeal extends EmsPayPaymentModule
     private function _getIssuers()
     {
         try {
-            return $this->ginger->getIdealIssuers()->toArray();
+            return $this->ginger->getIdealIssuers();
         } catch (\Exception $e) {
             $this->context->controller->errors[] = $this->l($e->getMessage());
             return [];
@@ -92,39 +94,48 @@ class emspayIdeal extends EmsPayPaymentModule
 
     public function execPayment($cart, $locale = '')
     {
-        try {
-            $customerObj = $this->_createCustomer($cart, $locale);
-            $response = $this->ginger->createIdealOrder(
-                    Helper::getAmountInCents($cart->getOrderTotal(true)),                           // Amount in cents
-                    $this->getPaymentCurrency(),                                                    // Currency
-                    filter_input(INPUT_POST, 'issuerid'),                                           // Issuer Id
-                    $this->getPaymentDescription(),                                                 // Description
-                    $this->currentOrder,                                                            // Merchant Order Id
-                    $this->getReturnURL($cart->id, $this->name),                                    // Return URL
-                    null,                                                                           // Expiration Period
-                    $customerObj->toArray(),                                                        // Customer information
-                    ['plugin' => $this->getPluginVersion()],                                        // Extra information
-                    $this->getWebhookUrl()                                                           // Webhook URL
-            );
+	  $customer = $this->createCustomer($cart, $locale);
+	  try {
+		$response = $this->ginger->createOrder([
+		    'amount' => Helper::getAmountInCents($cart->getOrderTotal(true)),   // Amount in cents
+		    'currency' => $this->getPaymentCurrency(),                          // Currency
+		    'transactions' => [
+		        [
+		            'payment_method' => $this->method_id,                       // Payment method
+				'payment_method_details' => ['issuer_id' => (string) filter_input(INPUT_POST, 'issuerid')]
+
+			  ]
+		    ],
+		    'description' => $this->getPaymentDescription(),                    // Description
+		    'merchant_order_id' => $this->currentOrder,                         // Merchant Order Id
+		    'return_url' => $this->getReturnURL($cart->id, $this->name),        // Return URL
+		    'customer' => $customer->toArray(),                                 // Customer information
+		    'extra' => ['plugin' => $this->getPluginVersion()],                 // Extra information
+		    'webhook_url' => $this->getWebhookUrl(),                            // Webhook URL
+		]);
         } catch (\Exception $exception) {
             return Tools::displayError($exception->getMessage());
         }
 
-        if ($response->status()->isError()) {
-            return $response->transactions()->current()->reason()->toString();
+        if ($response['status'] == 'error') {
+            return Tools::displayError($response['transactions'][0]['reason']);
         }
 
-        if (!$response->getId()) {
+        if (!$response['id']) {
             return Tools::displayError("Error: Response did not include id!");
         }
 
-        if (!$response->firstTransactionPaymentUrl()) {
-            return Tools::displayError("Error: Response did not include payment url!");
-        }
+	  $pay_url = array_key_exists(0, $response['transactions'])
+		  ? $response['transactions'][0]['payment_url']
+		  : null;
+
+	  if (!$pay_url) {
+		return Tools::displayError("Error: Response did not include payment url!");
+	  }
         
         $this->saveEMSOrderId($response, $cart->id, $this->context->customer->secure_key, $this->name);
         
-        Tools::redirect($response->firstTransactionPaymentUrl()->toString());
+        Tools::redirect($pay_url);
     }
 
     /**
@@ -134,7 +145,7 @@ class emspayIdeal extends EmsPayPaymentModule
      * @param type $locale
      * @return Model\Customer\Customer
      */
-    private function _createCustomer($cart, $locale = '')
+    private function createCustomer($cart, $locale = '')
     {
         $presta_customer = new Customer((int) $cart->id_customer);
         $presta_address = new Address((int) $cart->id_address_invoice);

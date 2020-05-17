@@ -1,5 +1,6 @@
 <?php
 
+use PrestaShop\PrestaShop\Core\Addon\Module\ModuleManagerBuilder;
 use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
 use Lib\EmsPayPaymentModule;
 use Lib\Helper;
@@ -16,6 +17,7 @@ class emspayBanktransfer extends EmsPayPaymentModule
     public function __construct()
     {
         $this->name = 'emspaybanktransfer';
+	  $this->method_id = 'bank-transfer';
         parent::__construct();
         $this->displayName = $this->l('EMS Online Banktransfer');
         $this->description = $this->l('Accept payments for your products using EMS Online Banktransfer');
@@ -110,40 +112,35 @@ class emspayBanktransfer extends EmsPayPaymentModule
                     $cart->id_customer,
                     $locale
                 );
-        
-        $paymentMethodDetails = [
-            'consumer_name' => implode(" ", [$customer->getFirstname(), $customer->getLastname()]),
-            'consumer_address' => $customer->getAddress(),
-            'consumer_city' => $presta_address->city,
-            'consumer_country' => $customer->getCountry()
-        ];
-       
         try {
-            $response = $this->ginger->createSepaOrder(
-                    Helper::getAmountInCents($cart->getOrderTotal(true)),   // Amount in cents
-                    $this->getPaymentCurrency(),                            // Currency
-                    $paymentMethodDetails,                                  // Payment method details
-                    $this->getPaymentDescription(),                         // Description
-                    $this->currentOrder,                                    // Merchant Order Id
-                    null,                                                   // Return URL
-                    null,                                                   // Expiration Period
-                    $customer->toArray(),                                   // Customer information
-                    ['plugin' => $this->getPluginVersion()],                // Extra information
-                    $this->getWebhookUrl()                                  // Webhook URL
-            );
+		$response = $this->ginger->createOrder([
+			  'amount' => Helper::getAmountInCents($cart->getOrderTotal(true)),   // Amount in cents
+			  'currency' => $this->getPaymentCurrency(),                          // Currency
+			  'transactions' => [
+				  [
+					'payment_method' => $this->method_id                      // Payment method
+				  ]
+			  ],
+			  'description' => $this->getPaymentDescription(),                    // Description
+			  'merchant_order_id' => $this->currentOrder,                         // Merchant Order Id
+			  'return_url' => $this->getReturnURL($cart->id, $this->name),        // Return URL
+			  'customer' => $customer->toArray(),                                 // Customer information
+			  'extra' => ['plugin' => $this->getPluginVersion()],                 // Extra information
+			  'webhook_url' => $this->getWebhookUrl(),                            // Webhook URL
+		]);
         } catch (\Exception $exception) {
             return Tools::displayError($exception->getMessage());
         }
 
-        if ($response->status()->isError()) {
-            return $response->transactions()->current()->reason()->toString();
+        if ($response['status'] == 'error') {
+            return Tools::displayError($response['transactions'][0]['reason']);
         }
 
-        if (!$response->getId()) {
+        if (!$response['id']) {
             return Tools::displayError("Error: Response did not include id!");
         }
 
-        $bankReference = $response->transactions()->current()->paymentMethodDetails()->reference()->toString();
+        $bankReference = !empty(current($response['transactions'])) ? current($response['transactions'])['payment_method_details']['reference'] : null;
 
         $extra_vars = array(
             '{bankwire_owner}' => "THIRD PARTY FUNDS EMS",
@@ -163,18 +160,17 @@ class emspayBanktransfer extends EmsPayPaymentModule
             $this->context->customer->secure_key
         );
 
-        $this->saveEMSOrderId($response, $cart->id, $this->context->customer->secure_key, $this->name, $this->currentOrder, $response->transactions()->current()->paymentMethodDetails()->reference()->toString());
-        $this->_updateOrder($response->getId());
+        $this->saveEMSOrderId($response, $cart->id, $this->context->customer->secure_key, $this->name, $this->currentOrder, $bankReference);
+        $this->_updateOrder($response['id']);
         $this->sendPrivateMessage($bankReference);
 
-        Tools::redirect($this->getReturnURL($cart->id, $this->name, $response->getId()));
+        Tools::redirect($this->getReturnURL($cart->id, $this->name, $response['id']));
     }
 
     private function _updateOrder($orderId)
     {
         $orderData = $this->ginger->getOrder($orderId);
-        $orderData->merchantOrderId($this->currentOrder);
-        $this->ginger->updateOrder($orderData);
+        $this->ginger->updateOrder($orderId.'/', $orderData);
     }
 
     /**

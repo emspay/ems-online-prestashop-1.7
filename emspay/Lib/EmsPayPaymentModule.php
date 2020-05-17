@@ -2,6 +2,7 @@
 
 namespace Lib;
 
+use Ginger\Ginger;
 use Model\Emspay\Emspay;
 use Model\Emspay\EmspayGateway;
 
@@ -15,6 +16,7 @@ abstract class EmsPayPaymentModule extends \PaymentModule
     protected $extra_mail_vars;
     protected $ginger;
     protected $useDemoApiKey = false;
+    protected $method_id;
 
     const PLUGIN_TYPE = 'emspay';
     const EMSPAY_KLARNA_PLUGIN_NAME   = 'emspayklarnapaylater';
@@ -101,8 +103,7 @@ abstract class EmsPayPaymentModule extends \PaymentModule
     public function updateGingerOrder($GingerOrderId, $PSOrderId)
     {
         $orderData = $this->ginger->getOrder($GingerOrderId);
-        $orderData->merchantOrderId($PSOrderId);
-        $this->ginger->updateOrder($orderData);
+        $this->ginger->updateOrder($GingerOrderId.'/', $orderData);
     }
 
     /**
@@ -115,7 +116,7 @@ abstract class EmsPayPaymentModule extends \PaymentModule
     protected function saveEMSOrderId($response, $cartId, $customerSecureKey, $type, $currentOrder = null, $reference = null)
     {
         $emspay = new Emspay();
-        $emspay->setGingerOrderId($response->id()->toString())
+        $emspay->setGingerOrderId($response['id'])
                 ->setIdCart($cartId)
                 ->setKey($customerSecureKey)
                 ->setPaymentMethod($type)
@@ -180,7 +181,7 @@ abstract class EmsPayPaymentModule extends \PaymentModule
      */
     protected function getPaymentCurrency()
     {
-        return \GingerPayments\Payment\Currency::EUR;
+        return 'EUR';
     }
     
     

@@ -1,6 +1,6 @@
 <?php
 
-$composer = require_once(_PS_MODULE_DIR_ . '/emspay/ems-php/vendor/autoload.php');
+$composer = require_once(_PS_MODULE_DIR_ . '/emspay/ginger-php/vendor/autoload.php');
 
 if (is_object($composer)) {
     $composer->addPsr4("Lib\\", _PS_MODULE_DIR_ . '/emspay/Lib/');

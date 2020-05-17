@@ -2,14 +2,15 @@
 
 namespace Lib;
 
+use Ginger\Ginger;
+
 class GingerClientFactory {
 
     /**
      * Create Ginger client
      * 
      * @param \Lib\GingerClientFactoryParams $params
-     * @return GingerPayments\Payment\Client
-     * @throws \Assert\InvalidArgumentException
+     * @return \Ginger\ApiClient
      * @throws \InvalidArgumentException
      */
     public static function create(GingerClientFactoryParams $params) {
@@ -20,18 +21,28 @@ class GingerClientFactory {
                         throw new \InvalidArgumentException('APIKEY is not provided');
                     }
 
-                    $ginger = \GingerPayments\Payment\Ginger::createClient( $params->getApiKey());
-                    if (null !== $params->getBundleCa()) {
-                        $ginger->useBundledCA();
-                    }
-                    return $ginger;
+			  return Ginger::createClient(
+				  Helper::GINGER_ENDPOINT,
+				  $params->getApiKey(),
+				  (null !== $params->getBundleCa()) ?
+					  [
+						  CURLOPT_CAINFO => Helper::getCaCertPath()
+					  ] : []
+			  );
                 } catch (\Assert\InvalidArgumentException $exception) {
                     throw $exception;
                 }
                 break;
 
             case 'ginger':
-                return \GingerPayments\Payment\Ginger::createClient($params->getApiKey());
+		    return Ginger::createClient(
+			    Helper::GINGER_ENDPOINT,
+			    $params->getApiKey(),
+			    (null !== $params->getBundleCa()) ?
+				    [
+					    CURLOPT_CAINFO => Helper::getCaCertPath()
+				    ] : []
+		    );
             default:
                 throw new \InvalidArgumentException('Client is not supported');
         }
