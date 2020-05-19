@@ -271,7 +271,7 @@ class emspayKlarnaPayLater extends EmsPayPaymentModule
         );
 
         $emspay = new Emspay();
-        $emspay->setGingerOrderId($response['id'])
+        $emspay->setGingerOrderId((string)$response['id'])
                 ->setIdCart($cart->id)
                 ->setKey($this->context->customer->secure_key)
                 ->setIdOrder($this->currentOrder)
@@ -318,7 +318,7 @@ class emspayKlarnaPayLater extends EmsPayPaymentModule
                 'type' => Helper::PHYSICAL,
                 'amount' => Helper::getAmountInCents(Tools::ps_round($product['price_wt'], 2)),
                 'currency' => $this->getPaymentCurrency(),
-                'quantity' => $product['cart_quantity'],
+                'quantity' => (int)$product['cart_quantity'],
                 'image_url' => $this->getProductCoverImage($product),
                 'vat_percentage' => ((int) $product['rate'] * 100),
                 'merchant_order_line_id' => $product['unique_id']
