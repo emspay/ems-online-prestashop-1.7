@@ -19,7 +19,8 @@ class emspayBanktransferValidationModuleFrontController extends ModuleFrontContr
 			    ] : []
 	  		);
 
-        $ginger_order_status = $ginger->getOrder(Tools::getValue('order_id'))->getStatus();
+	  $ginger_order = $ginger->getOrder(Tools::getValue('order_id'));
+        $ginger_order_status = $ginger_order['status'];
         $cart_id = Tools::getValue('id_cart');
 
         switch ($ginger_order_status) {

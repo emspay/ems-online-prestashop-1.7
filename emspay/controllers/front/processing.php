@@ -52,8 +52,8 @@ class emspayProcessingModuleFrontController extends ModuleFrontController
 				  CURLOPT_CAINFO => Helper::getCaCertPath()
 			    ] : []
 	  		);
-
-        return $ginger->getOrder(\Tools::getValue('order_id'))->getStatus();
+	  $ginger_order = $ginger->getOrder(\Tools::getValue('order_id'));
+        return $ginger_order['status'];
     }
 
     /**

@@ -133,7 +133,8 @@ class emspayafterpayValidationModuleFrontController extends ModuleFrontControlle
 				  CURLOPT_CAINFO => Helper::getCaCertPath()
 			    ] : []
 	  		);
+	  $ginger_order = $ginger->getOrder(\Tools::getValue('order_id'));
 
-        return $ginger->getOrder(\Tools::getValue('order_id'))->getStatus();
+        return $ginger_order['status'];
     }
 }

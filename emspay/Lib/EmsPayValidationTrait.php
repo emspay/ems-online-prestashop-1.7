@@ -111,9 +111,9 @@ trait EmsPayValidationTrait
 				  CURLOPT_CAINFO => Helper::getCaCertPath()
 			    ] : []
 	  	      );
-	  $order = $ginger->getOrder($orderId);
+	  $ginger_order = $ginger->getOrder($orderId);
 
-        return $order['status'];
+        return $ginger_order['status'];
     }
             
 }
