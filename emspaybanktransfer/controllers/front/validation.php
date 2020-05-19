@@ -1,6 +1,7 @@
 <?php
-use Lib\GingerClientFactory;
-use Lib\GingerClientFactoryParams;
+
+use Ginger\Ginger;
+use Lib\Helper;
 
 require_once(_PS_MODULE_DIR_ . '/emspay/emspay_module_bootstrap.php');
 
@@ -9,13 +10,14 @@ class emspayBanktransferValidationModuleFrontController extends ModuleFrontContr
 
     public function postProcess() {
         
-        $ginger = GingerClientFactory::create(
-                new GingerClientFactoryParams(
-                        'emspay',
-                        \Configuration::get('EMS_PAY_APIKEY'),
-                        \Configuration::get('EMS_PAY_BUNDLE_CA')
-                        )
-                );
+        $ginger = Ginger::createClient(
+		  	Helper::GINGER_ENDPOINT,
+		  	\Configuration::get('EMS_PAY_APIKEY'),
+		  	(null !== \Configuration::get('EMS_PAY_BUNDLE_CA')) ?
+			    [
+				  CURLOPT_CAINFO => Helper::getCaCertPath()
+			    ] : []
+	  		);
 
         $ginger_order_status = $ginger->getOrder(Tools::getValue('order_id'))->getStatus();
         $cart_id = Tools::getValue('id_cart');

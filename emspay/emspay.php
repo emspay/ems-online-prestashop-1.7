@@ -1,8 +1,5 @@
 <?php
 
-use Lib\GingerClientFactory;
-use Lib\GingerClientFactoryParams;
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
@@ -43,20 +40,6 @@ class emspay extends PaymentModule
 
         if (!count(Currency::checkPaymentCurrencies($this->id))) {
             $this->warning = $this->l('No currency has been set for this module.');
-        }
-    }
-
-    /**
-     * Method retrieves allowed products from EMS API and saves them to config
-     */
-    protected function initiateAllowedProducts()
-    {
-        if (Configuration::get('EMS_PAY_APIKEY')) {
-            $this->ginger = GingerClientFactory::create(new GingerClientFactoryParams('ginger', Configuration::get('EMS_PAY_APIKEY'), Configuration::get('EMS_PAY_BUNDLE_CA')));
-
-            $allowedProducts = $this->ginger->getAllowedProducts();
-
-            Configuration::updateValue('PAY_ENABLED_MODULES', json_encode($allowedProducts));
         }
     }
 

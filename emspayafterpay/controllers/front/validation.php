@@ -1,5 +1,8 @@
 <?php
 
+use Ginger\Ginger;
+use Lib\Helper;
+
 require_once(_PS_MODULE_DIR_ . '/emspay/emspay_module_bootstrap.php');
 
 class emspayafterpayValidationModuleFrontController extends ModuleFrontController
@@ -122,13 +125,14 @@ class emspayafterpayValidationModuleFrontController extends ModuleFrontControlle
     public function getOrderStatus()
     {
         $apiKey = \Configuration::get('EMS_PAY_AFTERPAY_APIKEY_TEST') ?: \Configuration::get('EMS_PAY_APIKEY');
-        $ginger = \Lib\GingerClientFactory::create(
-                        new \Lib\GingerClientFactoryParams(
-                                'emspay',
-                                $apiKey,
-                                \Configuration::get('EMS_PAY_BUNDLE_CA')
-                        )
-                );
+        $ginger = Ginger::createClient(
+		  	Helper::GINGER_ENDPOINT,
+		  	$apiKey,
+		  	(null !== \Configuration::get('EMS_PAY_BUNDLE_CA')) ?
+			    [
+				  CURLOPT_CAINFO => Helper::getCaCertPath()
+			    ] : []
+	  		);
 
         return $ginger->getOrder(\Tools::getValue('order_id'))->getStatus();
     }

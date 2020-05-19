@@ -2,6 +2,8 @@
 
 namespace Lib;
 
+use Ginger\Ginger;
+
 /**
  * Description of TraitValidation
  *
@@ -101,13 +103,14 @@ trait EmsPayValidationTrait
      */
     public function getOrderStatus($orderId)
     {
-        $ginger = GingerClientFactory::create(
-                        new GingerClientFactoryParams(
-                                'emspay',
-                                \Configuration::get('EMS_PAY_APIKEY'),
-                                \Configuration::get('EMS_PAY_BUNDLE_CA')
-                        )
-                );
+        $ginger = Ginger::createClient(
+		      Helper::GINGER_ENDPOINT,
+		      \Configuration::get('EMS_PAY_APIKEY'),
+		      (null !== \Configuration::get('EMS_PAY_BUNDLE_CA')) ?
+			    [
+				  CURLOPT_CAINFO => Helper::getCaCertPath()
+			    ] : []
+	  	      );
 	  $order = $ginger->getOrder($orderId);
 
         return $order['status'];

@@ -48,13 +48,14 @@ abstract class EmsPayPaymentModule extends \PaymentModule
     {
         try {
             $apiKey = $this->apiKeyResolver();
-            $this->ginger = GingerClientFactory::create(
-                    new GingerClientFactoryParams(
-                            self::PLUGIN_TYPE,
-                            $apiKey,
-                            \Configuration::get('EMS_PAY_BUNDLE_CA')
-                            )
-                    );
+            $this->ginger = Ginger::createClient(
+            		    Helper::GINGER_ENDPOINT,
+			          $apiKey,
+				    (null !== \Configuration::get('EMS_PAY_BUNDLE_CA')) ?
+					    [
+						CURLOPT_CAINFO => Helper::getCaCertPath()
+					    ] : []
+				    );
         } catch (\Exception $exception) {
             $this->warning = $exception->getMessage();
         }
