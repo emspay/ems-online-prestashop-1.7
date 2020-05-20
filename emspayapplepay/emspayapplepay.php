@@ -97,7 +97,7 @@ class emspayApplePay extends EmsPayPaymentModule
             return $response->transactions()->current()->reason()->toString();
         }
 
-        if (!$response->getId()) {
+        if (!$response['id']) {
             return Tools::displayError($response['transactions'][0]['reason']);
         }
 

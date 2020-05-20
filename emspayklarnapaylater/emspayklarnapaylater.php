@@ -370,7 +370,7 @@ class emspayKlarnaPayLater extends EmsPayPaymentModule
             'currency' => $this->getPaymentCurrency(),
             'vat_percentage' => Helper::getAmountInCents($this->getShippingTaxRate($cart)),
             'quantity' => 1,
-            'merchant_order_line_id' => count($cart->getProducts()) + 1
+            'merchant_order_line_id' => (string)(count($cart->getProducts()) + 1)
         ];
     }
 
