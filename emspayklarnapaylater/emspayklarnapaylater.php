@@ -258,6 +258,14 @@ class emspayKlarnaPayLater extends EmsPayPaymentModule
             return Tools::displayError("Error: Response did not include id!");
         }
 
+	  $pay_url = array_key_exists(0, $response['transactions'])
+		  ? $response['transactions'][0]['payment_url']
+		  : null;
+
+	  if (!$pay_url) {
+		return Tools::displayError("Error: Response did not include payment url!");
+	  }
+
         $this->validateOrder(
             $cart->id,
             Configuration::get('PS_OS_PREPARATION'),
@@ -279,10 +287,7 @@ class emspayKlarnaPayLater extends EmsPayPaymentModule
         (new EmspayGateway(\Db::getInstance()))
                     ->save($emspay);
        
-        $orderData = $this->ginger->getOrder($response['id']);
-        $this->ginger->updateOrder($response['id'] . '/', $orderData);
-
-        Tools::redirect($this->getReturnURL($cart->id, $this->name, $response['id']));
+        Tools::redirect($pay_url);
     }
 
      

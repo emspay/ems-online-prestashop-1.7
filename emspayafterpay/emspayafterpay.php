@@ -342,7 +342,7 @@ class emspayAfterpay extends EmsPayPaymentModule
         
         $orderData = $this->ginger->getOrder($response['id']);
 	  Helper::orderDataToString($orderData);
-        $this->ginger->updateOrder($response['id'] . '/', $orderData);
+        $this->ginger->updateOrder($response['id'], $orderData);
 
         Tools::redirect($this->getReturnURL($cart->id, $this->name, $response['id']));
     }

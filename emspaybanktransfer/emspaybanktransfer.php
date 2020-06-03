@@ -170,7 +170,7 @@ class emspayBanktransfer extends EmsPayPaymentModule
     private function _updateOrder($orderId)
     {
         $orderData = $this->ginger->getOrder($orderId);
-        $this->ginger->updateOrder($orderId.'/', $orderData);
+        $this->ginger->updateOrder($orderId, $orderData);
     }
 
     /**

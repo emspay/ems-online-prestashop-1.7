@@ -104,7 +104,11 @@ abstract class EmsPayPaymentModule extends \PaymentModule
     public function updateGingerOrder($GingerOrderId, $PSOrderId)
     {
         $orderData = $this->ginger->getOrder($GingerOrderId);
-        $this->ginger->updateOrder($GingerOrderId.'/', $orderData);
+        $orderData['merchant_order_id'] = (string)$PSOrderId;
+	  if(isset($orderData['transactions'][0]['payment_method_details'])) {
+		unset($orderData['transactions'][0]['payment_method_details']);
+	  }
+        $this->ginger->updateOrder($GingerOrderId, $orderData);
     }
 
     /**
