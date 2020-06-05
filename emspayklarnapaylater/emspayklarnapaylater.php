@@ -137,7 +137,7 @@ class emspayKlarnaPayLater extends EmsPayPaymentModule
         }
         
         $emspay = $this->getOrderFromDB($params['order']->id_cart);
-        $this->updateGingerOrder($emspay->getGingerOrderId(), $params['order']->id);
+        $this->updateGingerOrder($emspay->getGingerOrderId(), $params['order']->id, $params['order']->total_paid);
 
         return $this->fetch('module:'.$this->name.'/views/templates/hook/payment_return.tpl');
     }

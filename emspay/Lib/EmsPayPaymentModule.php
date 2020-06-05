@@ -101,13 +101,13 @@ abstract class EmsPayPaymentModule extends \PaymentModule
      *
      * @param type $orderId
      */
-    public function updateGingerOrder($GingerOrderId, $PSOrderId)
+    public function updateGingerOrder($GingerOrderId, $PSOrderId, $amount)
     {
-        $orderData = $this->ginger->getOrder($GingerOrderId);
-        $orderData['merchant_order_id'] = (string)$PSOrderId;
-	  if(isset($orderData['transactions'][0]['payment_method_details'])) {
-		unset($orderData['transactions'][0]['payment_method_details']);
-	  }
+        $orderData = [
+        	'amount' => Helper::getAmountInCents($amount),
+		'currency' => $this->getPaymentCurrency(),
+		'merchant_order_id' => (string) $PSOrderId
+	  ];
         $this->ginger->updateOrder($GingerOrderId, $orderData);
     }
 

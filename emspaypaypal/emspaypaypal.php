@@ -145,7 +145,7 @@ class emspaypaypal extends EmsPayPaymentModule
         
         $emspay = $this->getOrderFromDB($params['order']->id_cart);
         $order = $params['order'];
-        $this->updateGingerOrder($emspay->getGingerOrderId(), $order->id);
+        $this->updateGingerOrder($emspay->getGingerOrderId(), $order->id, $order->total_paid);
         $this->updateOrderId($params['order']->id_cart, $order->id);
         
         return $this->fetch('module:'.$this->name.'/views/templates/hook/payment_return.tpl');
