@@ -2,6 +2,7 @@
 
 namespace Lib;
 
+use Ginger\Ginger;
 use Model\Emspay\Emspay;
 use Model\Emspay\EmspayGateway;
 
@@ -15,6 +16,7 @@ abstract class EmsPayPaymentModule extends \PaymentModule
     protected $extra_mail_vars;
     protected $ginger;
     protected $useDemoApiKey = false;
+    protected $method_id;
 
     const PLUGIN_TYPE = 'emspay';
     const EMSPAY_KLARNA_PLUGIN_NAME   = 'emspayklarnapaylater';
@@ -23,7 +25,7 @@ abstract class EmsPayPaymentModule extends \PaymentModule
     public function __construct()
     {
         $this->tab = 'payments_gateways';
-        $this->version = '1.1.1';
+        $this->version = '1.2.0';
         $this->author = 'Ginger Payments';
         $this->controllers = array('payment', 'validation');
         $this->is_eu_compatible = 1;
@@ -46,13 +48,14 @@ abstract class EmsPayPaymentModule extends \PaymentModule
     {
         try {
             $apiKey = $this->apiKeyResolver();
-            $this->ginger = GingerClientFactory::create(
-                    new GingerClientFactoryParams(
-                            self::PLUGIN_TYPE,
-                            $apiKey,
-                            \Configuration::get('EMS_PAY_BUNDLE_CA')
-                            )
-                    );
+            $this->ginger = Ginger::createClient(
+            		    Helper::GINGER_ENDPOINT,
+			          $apiKey,
+				    (null !== \Configuration::get('EMS_PAY_BUNDLE_CA')) ?
+					    [
+						CURLOPT_CAINFO => Helper::getCaCertPath()
+					    ] : []
+				    );
         } catch (\Exception $exception) {
             $this->warning = $exception->getMessage();
         }
@@ -98,11 +101,14 @@ abstract class EmsPayPaymentModule extends \PaymentModule
      *
      * @param type $orderId
      */
-    public function updateGingerOrder($GingerOrderId, $PSOrderId)
+    public function updateGingerOrder($GingerOrderId, $PSOrderId, $amount)
     {
-        $orderData = $this->ginger->getOrder($GingerOrderId);
-        $orderData->merchantOrderId($PSOrderId);
-        $this->ginger->updateOrder($orderData);
+        $orderData = [
+        	'amount' => Helper::getAmountInCents($amount),
+		'currency' => $this->getPaymentCurrency(),
+		'merchant_order_id' => (string) $PSOrderId
+	  ];
+        $this->ginger->updateOrder($GingerOrderId, $orderData);
     }
 
     /**
@@ -115,7 +121,7 @@ abstract class EmsPayPaymentModule extends \PaymentModule
     protected function saveEMSOrderId($response, $cartId, $customerSecureKey, $type, $currentOrder = null, $reference = null)
     {
         $emspay = new Emspay();
-        $emspay->setGingerOrderId($response->id()->toString())
+        $emspay->setGingerOrderId($response['id'])
                 ->setIdCart($cartId)
                 ->setKey($customerSecureKey)
                 ->setPaymentMethod($type)
@@ -180,7 +186,7 @@ abstract class EmsPayPaymentModule extends \PaymentModule
      */
     protected function getPaymentCurrency()
     {
-        return \GingerPayments\Payment\Currency::EUR;
+        return 'EUR';
     }
     
     

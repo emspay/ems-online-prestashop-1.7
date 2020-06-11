@@ -9,22 +9,43 @@ namespace Lib;
  */
 class Helper
 {
+    /**
+     * GINGER_ENDPOINT used for create Ginger client
+     */
+    const GINGER_ENDPOINT = 'https://api.online.emspay.eu';
+
+    const PHYSICAL = 'physical';
+    const SHIPPING_FEE = 'shipping_fee';
+
+    /**
+     * @var array
+     */
+    public static $afterPayCountries = ['NL', 'BE'];
+
     public static function getAmountInCents($amount)
     {
         return (int) round($amount * 100);
     }
     
     /**
-     * @param type $array
+     * @param array $array
      * @return array
      */
     public static function getArrayWithoutNullValues($array)
     {
-        return array_values(
-                \GingerPayments\Payment\Common\ArrayFunctions::withoutNullValues(
-                    array_unique($array)
-                )
-            );
+	  static $fn = __FUNCTION__;
+
+	  foreach (array_unique($array) as $key => $value) {
+		if (is_array($value)) {
+		    $array[$key] = self::$fn($array[$key]);
+		}
+
+		if (empty($array[$key]) && $array[$key] !== '0' && $array[$key] !== 0) {
+		    unset($array[$key]);
+		}
+	  }
+
+	  return $array;
     }
     
     /**
@@ -40,5 +61,28 @@ class Helper
             return (bool) ($matches[2] != '00' && $matches[3] != '00');
         }
         return false;
+    }
+
+    /**
+     * Get CA certificate path
+     *
+     * @return bool|string
+     */
+    public static function getCaCertPath(){
+	  return realpath(_PS_MODULE_DIR_ . '/emspay/ginger-php/assets/cacert.pem');
+    }
+
+    /**
+     * Convert int data in order to string
+     * @param array $orderData
+     * @return array
+     */
+    public static function orderDataToString($orderData)
+    {
+	  $orderData["order_lines"][0]["vat_percentage"]=(int)$orderData["order_lines"][0]["vat_percentage"];
+	  $orderData["order_lines"][0]["amount"]=(int)$orderData["order_lines"][0]["amount"];
+	  $orderData["order_lines"][0]["quantity"]=(int)$orderData["order_lines"][0]["quantity"];
+
+	  return $orderData;
     }
 }

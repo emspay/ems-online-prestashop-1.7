@@ -1,5 +1,6 @@
 <?php
 
+use PrestaShop\PrestaShop\Core\Addon\Module\ModuleManagerBuilder;
 use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
 use Lib\EmsPayPaymentModule;
 use Lib\Helper;
@@ -16,6 +17,7 @@ class emspaypaypal extends EmsPayPaymentModule
     public function __construct()
     {
         $this->name = 'emspaypaypal';
+	  $this->method_id = 'paypal';
         parent::__construct();
         $this->displayName = $this->l('EMS Online PayPal');
         $this->description = $this->l('Accept payments for your products using PayPal.');
@@ -71,39 +73,46 @@ class emspaypaypal extends EmsPayPaymentModule
 
     public function execPayment($cart, $locale = '')
     {
-        $customerObj = $this->_createCustomer($cart, $locale);
-        try {
-            $response = $this->ginger->createPaypalOrder(
-                Helper::getAmountInCents($cart->getOrderTotal(true)),     // Amount in cents
-                $this->getPaymentCurrency(),                              // Currency
-                [],
-                $this->getPaymentDescription(),                           // Description
-                $this->currentOrder,                                      // Merchant order id
-                $this->getReturnURL($cart->id, $this->name),              // Return url
-                null,                                                     // Expiration Period
-                $customerObj->toArray(),                                  // Customer information
-                ['plugin' => $this->getPluginVersion()],                  // Extra information
-                $this->getWebhookUrl()                                    // Webhook URL
-            );
+	  $customer = $this->createCustomer($cart, $locale);
+	  try {
+		$response = $this->ginger->createOrder([
+		    'amount' => Helper::getAmountInCents($cart->getOrderTotal(true)),   // Amount in cents
+		    'currency' => $this->getPaymentCurrency(),                          // Currency
+		    'transactions' => [
+		        [
+		            'payment_method' => $this->method_id                        // Payment method
+		        ]
+		    ],
+		    'description' => $this->getPaymentDescription(),                    // Description
+		    'merchant_order_id' => $this->currentOrder,                         // Merchant Order Id
+		    'return_url' => $this->getReturnURL($cart->id, $this->name),        // Return URL
+		    'customer' => $customer->toArray(),                                 // Customer information
+		    'extra' => ['plugin' => $this->getPluginVersion()],                 // Extra information
+		    'webhook_url' => $this->getWebhookUrl(),                            // Webhook URL
+		]);
         } catch (\Exception $exception) {
             return Tools::displayError($exception->getMessage());
         }
 
-        if ($response->status()->isError()) {
-            return $response->transactions()->current()->reason()->toString();
+        if ($response['status'] == 'error') {
+            return Tools::displayError($response['transactions'][0]['reason']);
         }
 
-        if (!$response->getId()) {
+        if (!$response['id']) {
             return Tools::displayError("Error: Response did not include id!");
         }
 
-        if (!$response->firstTransactionPaymentUrl()) {
-            return Tools::displayError("Error: Response did not include payment url!");
-        }
+	  $pay_url = array_key_exists(0, $response['transactions'])
+		  ? $response['transactions'][0]['payment_url']
+		  : null;
+
+	  if (!$pay_url) {
+		return Tools::displayError("Error: Response did not include payment url!");
+	  }
 
         $this->saveEMSOrderId($response, $cart->id, $this->context->customer->secure_key, $this->name);
 
-        Tools::redirect($response->firstTransactionPaymentUrl()->toString());
+        Tools::redirect($pay_url);
     }
 
     /**
@@ -113,7 +122,7 @@ class emspaypaypal extends EmsPayPaymentModule
      * @param type $locale
      * @return Model\Customer\Customer
      */
-    private function _createCustomer($cart, $locale = '')
+    private function createCustomer($cart, $locale = '')
     {
         $presta_customer = new Customer((int) $cart->id_customer);
         $presta_address = new Address((int) $cart->id_address_invoice);
@@ -136,7 +145,7 @@ class emspaypaypal extends EmsPayPaymentModule
         
         $emspay = $this->getOrderFromDB($params['order']->id_cart);
         $order = $params['order'];
-        $this->updateGingerOrder($emspay->getGingerOrderId(), $order->id);
+        $this->updateGingerOrder($emspay->getGingerOrderId(), $order->id, $order->total_paid);
         $this->updateOrderId($params['order']->id_cart, $order->id);
         
         return $this->fetch('module:'.$this->name.'/views/templates/hook/payment_return.tpl');
