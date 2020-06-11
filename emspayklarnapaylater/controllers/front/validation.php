@@ -1,7 +1,7 @@
 <?php
 
-use Lib\GingerClientFactory;
-use Lib\GingerClientFactoryParams;
+use Ginger\Ginger;
+use Lib\Helper;
 
 require_once(_PS_MODULE_DIR_ . '/emspay/emspay_module_bootstrap.php');
 
@@ -11,15 +11,16 @@ class emspayKlarnaPayLaterValidationModuleFrontController extends ModuleFrontCon
     public function postProcess() 
     {
         $apiKey = Configuration::get('EMS_PAY_APIKEY_TEST') ?: Configuration::get('EMS_PAY_APIKEY');
-        $ginger = GingerClientFactory::create(
-                    new GingerClientFactoryParams(
-                            'emspay',
-                            $apiKey,
-                            \Configuration::get('EMS_PAY_BUNDLE_CA')
-                    )
-                );
-
-        $ginger_order_status = $ginger->getOrder(Tools::getValue('order_id'))->getStatus();
+        $ginger = Ginger::createClient(
+		  	Helper::GINGER_ENDPOINT,
+		  	$apiKey,
+		  	(null !== \Configuration::get('EMS_PAY_BUNDLE_CA')) ?
+			    [
+				  CURLOPT_CAINFO => Helper::getCaCertPath()
+			    ] : []
+	  		);
+	  $ginger_order = $ginger->getOrder(Tools::getValue('order_id'));
+        $ginger_order_status = $ginger_order['status'];
         $cart_id = Tools::getValue('id_cart');
 
         switch ($ginger_order_status) {

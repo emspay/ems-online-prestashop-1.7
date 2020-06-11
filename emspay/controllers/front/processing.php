@@ -1,7 +1,7 @@
 <?php
 
-use Lib\GingerClientFactory;
-use Lib\GingerClientFactoryParams;
+use Ginger\Ginger;
+use Lib\Helper;
 
 class emspayProcessingModuleFrontController extends ModuleFrontController
 {
@@ -44,15 +44,16 @@ class emspayProcessingModuleFrontController extends ModuleFrontController
       */
     public function checkOrderStatus()
     {
-        $ginger = GingerClientFactory::create(
-                    new GingerClientFactoryParams(
-                            'emspay',
-                            \Configuration::get('EMS_PAY_APIKEY'),
-                            \Configuration::get('EMS_PAY_BUNDLE_CA')
-                    )
-                );
-
-        return $ginger->getOrder(\Tools::getValue('order_id'))->getStatus();
+        $ginger = Ginger::createClient(
+		  	Helper::GINGER_ENDPOINT,
+		  	\Configuration::get('EMS_PAY_APIKEY'),
+		  	(null !== \Configuration::get('EMS_PAY_BUNDLE_CA')) ?
+			    [
+				  CURLOPT_CAINFO => Helper::getCaCertPath()
+			    ] : []
+	  		);
+	  $ginger_order = $ginger->getOrder(\Tools::getValue('order_id'));
+        return $ginger_order['status'];
     }
 
     /**

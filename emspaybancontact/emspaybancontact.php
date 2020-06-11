@@ -1,5 +1,6 @@
 <?php
 
+use PrestaShop\PrestaShop\Core\Addon\Module\ModuleManagerBuilder;
 use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
 use Lib\EmsPayPaymentModule;
 use Lib\Helper;
@@ -16,6 +17,7 @@ class emspaybancontact extends EmsPayPaymentModule
     public function __construct()
     {
         $this->name = 'emspaybancontact';
+	  $this->method_id = 'bancontact';
 
         parent::__construct();
 
@@ -76,36 +78,44 @@ class emspaybancontact extends EmsPayPaymentModule
     {
         $customer = $this->createCustomer($cart, $locale);
         try {
-            $response = $this->ginger->createBancontactOrder(
-                    Helper::getAmountInCents($cart->getOrderTotal(true)),      // Amount in cents
-                    $this->getPaymentCurrency(),                               // Currency
-                    $this->getPaymentDescription(),                            // Description
-                    $this->currentOrder,                                       // Merchant order id
-                    $this->getReturnURL($cart->id, $this->name),               // Return url
-                    null,                                                      // Expiration Period
-                    $customer->toArray(),                                      // Customer information
-                    ['plugin' => $this->getPluginVersion()],                   // Extra information
-                    $this->getWebhookUrl()                                     // Webhook URL
-            );
+		$response = $this->ginger->createOrder([
+		    'amount' => Helper::getAmountInCents($cart->getOrderTotal(true)),   // Amount in cents
+		    'currency' => $this->getPaymentCurrency(),                          // Currency
+		    'transactions' => [
+		        [
+		            'payment_method' => $this->method_id                        // Payment method
+		        ]
+		    ],
+		    'description' => $this->getPaymentDescription(),                    // Description
+		    'merchant_order_id' => $this->currentOrder,                         // Merchant Order Id
+		    'return_url' => $this->getReturnURL($cart->id, $this->name),        // Return URL
+		    'customer' => $customer->toArray(),                                 // Customer information
+		    'extra' => ['plugin' => $this->getPluginVersion()],                 // Extra information
+		    'webhook_url' => $this->getWebhookUrl(),                            // Webhook URL
+		]);
         } catch (\Exception $exception) {
             return Tools::displayError($exception->getMessage());
         }
 
-        if ($response->status()->isError()) {
-            return $response->transactions()->current()->reason()->toString();
+        if ($response['status'] == 'error') {
+            return Tools::displayError($response['transactions'][0]['reason']);
         }
 
-        if (!$response->getId()) {
+        if (!$response['id']) {
             return Tools::displayError("Error: Response did not include id!");
         }
 
-        if (!$response->firstTransactionPaymentUrl()) {
-            return Tools::displayError("Error: Response did not include payment url!");
-        }
+	  $pay_url = array_key_exists(0, $response['transactions'])
+		  ? $response['transactions'][0]['payment_url']
+		  : null;
+
+	  if (!$pay_url) {
+		return Tools::displayError("Error: Response did not include payment url!");
+	  }
 
         $this->saveEMSOrderId($response, $cart->id, $this->context->customer->secure_key, $this->name);
 
-        Tools::redirect($response->firstTransactionPaymentUrl()->toString());
+        Tools::redirect($pay_url);
     }
 
     public function hookPaymentReturn($params)
@@ -115,7 +125,7 @@ class emspaybancontact extends EmsPayPaymentModule
         }
         
         $emspay = $this->getOrderFromDB($params['order']->id_cart);
-        $this->updateGingerOrder($emspay->getGingerOrderId(), $params['order']->id);
+        $this->updateGingerOrder($emspay->getGingerOrderId(), $params['order']->id, $params['order']->total_paid);
         
         return $this->fetch('module:' . $this->name . '/views/templates/hook/payment_return.tpl');
     }

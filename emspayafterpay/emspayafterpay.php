@@ -1,5 +1,6 @@
 <?php
 
+use PrestaShop\PrestaShop\Core\Addon\Module\ModuleManagerBuilder;
 use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
 use Lib\EmsPayPaymentModule;
 use Lib\Helper;
@@ -25,6 +26,7 @@ class emspayAfterpay extends EmsPayPaymentModule
     public function __construct()
     {
         $this->name = 'emspayafterpay';
+	  $this->method_id = 'afterpay';
         $this->useDemoApiKey = true;
         parent::__construct();
         $this->displayName = $this->l('EMS Online AfterPay');
@@ -261,7 +263,7 @@ class emspayAfterpay extends EmsPayPaymentModule
         }
         
         $emspay = $this->getOrderFromDB($params['order']->id_cart);
-        $this->updateGingerOrder($emspay->getGingerOrderId(), $params['order']->id);
+        $this->updateGingerOrder($emspay->getGingerOrderId(), $params['order']->id, $params['order']->total_paid);
 
         return $this->fetch('module:'.$this->name.'/views/templates/hook/payment_return.tpl');
     }
@@ -300,39 +302,37 @@ class emspayAfterpay extends EmsPayPaymentModule
     public function execPayment($cart, $locale = '')
     {
         $customer = $this->createCustomer($cart, $locale);
-        $orderLines = $this->getOrderLines($cart);
-        $description = $this->getPaymentDescription();
-        $totalInCents = Helper::getAmountInCents($cart->getOrderTotal(true));
-        $currency = \GingerPayments\Payment\Currency::EUR;
-        $webhookUrl = $this->getWebhookUrl();
-        
         try {
-            $response = $this->ginger->createAfterPayOrder(
-                $totalInCents,                                                      // Amount in cents
-                $currency,                                                          // Currency
-                $description,                                                       // Description
-                $this->currentOrder,                                                // Merchant Order Id
-                null,                                                               // Return URL
-                null,                                                               // Expiration Period
-                $customer->toArray(),                                               // Customer information
-                ['plugin' => $this->getPluginVersion()],                            // Extra information
-                $webhookUrl,                                                        // Webhook URL
-                $orderLines                                                         // Order lines
-            );
+            $response = $this->ginger->createOrder([
+		    'amount' => Helper::getAmountInCents($cart->getOrderTotal(true)),   // Amount in cents
+		    'currency' => $this->getPaymentCurrency(),                          // Currency
+		    'transactions' => [
+		        [
+			      'payment_method' => $this->method_id                        // Payment method
+			  ]
+		    ],
+		    'description' => $this->getPaymentDescription(),                    // Description
+		    'merchant_order_id' => $this->currentOrder,                         // Merchant Order Id
+		    'return_url' => $this->getReturnURL($cart->id, $this->name),        // Return URL
+		    'customer' => $customer->toArray(),                                 // Customer information
+		    'extra' => ['plugin' => $this->getPluginVersion()],                 // Extra information
+		    'webhook_url' => $this->getWebhookUrl(),                            // Webhook URL
+		    'order_lines' => $this->getOrderLines($cart)                        // Order lines
+            ]);
         } catch (\Exception $exception) {
             return Tools::displayError($exception->getMessage());
         }
 
-        if ($response->status()->isError()) {
-            return $response->transactions()->current()->reason()->toString();
+        if ($response['status'] == 'error') {
+            return Tools::displayError($response['transactions'][0]['reason']);
         }
  
-        if (!$response->getId()) {
+        if (!$response['id']) {
             return Tools::displayError("Error: Response did not include id!");
         }
         
         $emspay = new Emspay();
-        $emspay->setGingerOrderId($response->id()->toString())
+        $emspay->setGingerOrderId($response['id'])
                 ->setIdCart($cart->id)
                 ->setKey($this->context->customer->secure_key)
                 ->setIdOrder($this->currentOrder)
@@ -340,11 +340,11 @@ class emspayAfterpay extends EmsPayPaymentModule
         (new EmspayGateway(\Db::getInstance()))
                     ->save($emspay);
         
-        $orderData = $this->ginger->getOrder($response->getId());
-        $orderData->merchantOrderId($this->currentOrder);
-        $this->ginger->updateOrder($orderData);
+        $orderData = $this->ginger->getOrder($response['id']);
+	  Helper::orderDataToString($orderData);
+        $this->ginger->updateOrder($response['id'], $orderData);
 
-        Tools::redirect($this->getReturnURL($cart->id, $this->name, $response->getId()));
+        Tools::redirect($this->getReturnURL($cart->id, $this->name, $response['id']));
     }
      
     /**
@@ -383,10 +383,10 @@ class emspayAfterpay extends EmsPayPaymentModule
                 'ean' => $this->getProductEAN($product),
                 'url' => $this->getProductURL($product),
                 'name' => $product['name'],
-                'type' => \GingerPayments\Payment\Order\OrderLine\Type::PHYSICAL,
+                'type' => Helper::PHYSICAL,
                 'amount' => Helper::getAmountInCents(Tools::ps_round($product['price_wt'], 2)),
-                'currency' => \GingerPayments\Payment\Currency::EUR,
-                'quantity' => $product['cart_quantity'],
+                'currency' => $this->getPaymentCurrency(),
+                'quantity' => (int)$product['cart_quantity'],
                 'image_url' => $this->getProductCoverImage($product),
                 'vat_percentage' => ((int) $product['rate'] * 100),
                 'merchant_order_line_id' => $product['unique_id']
@@ -413,9 +413,9 @@ class emspayAfterpay extends EmsPayPaymentModule
     {
         return [
             'name' => $this->l("Shipping Fee"),
-            'type' => \GingerPayments\Payment\Order\OrderLine\Type::SHIPPING_FEE,
+            'type' => Helper::SHIPPING_FEE,
             'amount' => Helper::getAmountInCents($shippingFee),
-            'currency' => \GingerPayments\Payment\Currency::EUR,
+            'currency' => $this->getPaymentCurrency(),
             'vat_percentage' => Helper::getAmountInCents($this->getShippingTaxRate($cart)),
             'quantity' => 1,
             'merchant_order_line_id' => count($cart->getProducts()) + 1

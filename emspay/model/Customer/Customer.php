@@ -121,10 +121,10 @@ class Customer
                 $psCustomer->firstname,
                 $psCustomer->lastname,
                 $merchantCustomerId,
-                Helper::getArrayWithoutNullValues([
-                     (string) $psAddress->phone,
-                     (string) $psAddress->phone_mobile
-                ]),
+		  ($psAddress->phone || $psAddress->phone_mobile) ? Helper::getArrayWithoutNullValues([
+			  (string) $psAddress->phone,
+			  (string) $psAddress->phone_mobile
+		    ]) : null,
                 $locale,
                 $psCustomer->id_gender == '1' ? 'male' : 'female',
                 Helper::isBirthdateValid($psCustomer->birthday) ? $psCustomer->birthday : null,
