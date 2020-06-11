@@ -25,7 +25,7 @@ abstract class EmsPayPaymentModule extends \PaymentModule
     public function __construct()
     {
         $this->tab = 'payments_gateways';
-        $this->version = '1.1.1';
+        $this->version = '1.2.0';
         $this->author = 'Ginger Payments';
         $this->controllers = array('payment', 'validation');
         $this->is_eu_compatible = 1;
