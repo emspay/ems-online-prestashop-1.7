@@ -119,7 +119,7 @@ class emspayAfterpay extends EmsPayPaymentModule
                         'label' => $this->l('Countries available for AfterPay.'),
                         'name' => 'EMS_AFTERPAY_COUNTRY_ACCESS',
                         'required' => true,
-                        'desc' => $this->l('To allow AfterPay to be used for any other country just add its country code (in ISO 2 standard) to the "Countries available for AfterPay" field. Example: BE, NL, FR'),
+                        'desc' => $this->l('To allow AfterPay to be used for any other country just add its country code (in ISO 2 standard) to the "Countries available for AfterPay" field. Example: BE, NL, FR If field is empty then AfterPay will be available for all countries.'),
                     ),
                 ),
                 'submit' => array(
@@ -172,11 +172,9 @@ class emspayAfterpay extends EmsPayPaymentModule
         if (!$this->active) {
             return;
         }
-        
         if (!$this->checkCurrency($params['cart'])) {
             return;
         }
-
         if ($this->isSetShowForIpFilter()) {
             return;
         }
@@ -270,13 +268,12 @@ class emspayAfterpay extends EmsPayPaymentModule
     protected function CountryAccess($idusercountry)
     {
         $ems_afterpay_country_access = Configuration::get('EMS_AFTERPAY_COUNTRY_ACCESS');
-            if (strlen($ems_afterpay_country_access)) {
-                $countrylist =  explode(",",str_replace(' ','',$ems_afterpay_country_access));
-                if (in_array($this->getUserCountryFromAddressId($idusercountry), $countrylist)) {
-                    return true;
-                }
+            if (empty($ems_afterpay_country_access)) {
+                return true;
+            } else {
+                $countrylist = array_map('trim', (explode(",", $ems_afterpay_country_access)));
+                return in_array($this->getUserCountryFromAddressId($idusercountry), $countrylist);
             }
-            return false;
     }
     
     public function hookPaymentReturn($params)
