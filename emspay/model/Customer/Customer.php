@@ -110,9 +110,9 @@ class Customer
         return $response;
     }
 
-    public static function createFromPrestaData(\Customer $psCustomer, \Address $psAddress, $psBillingAddress, \Country $psCountry, $merchantCustomerId, $locale = null, $ipAddress = null)
+    public static function createFromPrestaData(\Customer $psCustomer, \Address $psAddress, \Country $psCountry, $merchantCustomerId, $locale = null, $ipAddress = null)
     {
-        $billingAddress =  \Billing::createFromPrestaBillingData($psBillingAddress, $psCountry);
+        $billingAddress =  \Billing::createFromPrestaBillingData($psAddress, $psCountry);
 
         return new static(
                 implode("\n", array_filter(array(
