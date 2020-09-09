@@ -4,10 +4,13 @@ namespace Model\Customer;
 
 use Lib\Helper;
 
+require_once(_PS_MODULE_DIR_ . '/emspay/model/Customer/Billing.php');
+
 class Customer
 {
     private $address;
     private $address_type;
+    private $additional_addresses;
     private $country;
     private $email_address;
     private $first_name;
@@ -19,10 +22,11 @@ class Customer
     private $birthdate;
     private $ip_address;
 
-    public function __construct($address, $address_type, $country, $email_address, $first_name, $last_name, $merchant_customer_id, $phone_numbers, $locale = null, $gender = null, $birthdate  = null, $ipAddress = null)
+    public function __construct($address, $address_type, $additional_addresses, $country, $email_address, $first_name, $last_name, $merchant_customer_id, $phone_numbers, $locale = null, $gender = null, $birthdate  = null, $ipAddress = null)
     {
         $this->address = $address;
         $this->address_type = $address_type;
+        $this->additional_addresses = $additional_addresses;
         $this->country = $country;
         $this->email_address = $email_address;
         $this->first_name = $first_name;
@@ -105,9 +109,11 @@ class Customer
         }
         return $response;
     }
-    
-    public static function createFromPrestaData(\Customer $psCustomer, \Address $psAddress, \Country $psCountry, $merchantCustomerId, $locale = null, $ipAddress = null)
+
+    public static function createFromPrestaData(\Customer $psCustomer, \Address $psAddress, $psBillingAddress, \Country $psCountry, $merchantCustomerId, $locale = null, $ipAddress = null)
     {
+        $billingAddress =  \Billing::createFromPrestaBillingData($psBillingAddress, $psCountry);
+
         return new static(
                 implode("\n", array_filter(array(
                     $psAddress->company,
@@ -116,6 +122,11 @@ class Customer
                     $psAddress->postcode . " " . $psAddress->city,
                 ))),
                 'customer',
+                [array_filter(array(
+                    'address' => $billingAddress->getAddress(),
+                    'address_type' => $billingAddress->getAddressType(),
+                    'country' => $billingAddress->getCountry(),
+                ))],
                 $psCountry->iso_code,
                 $psCustomer->email,
                 $psCustomer->firstname,
