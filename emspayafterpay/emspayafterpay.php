@@ -393,6 +393,7 @@ class emspayAfterpay extends EmsPayPaymentModule
     {
         $presta_customer = new Customer((int) $cart->id_customer);
         $presta_address = new Address((int) $cart->id_address_invoice);
+        $presta_billing_address = new Address((int) $cart->id_address_invoice);
         $presta_country = new Country((int) $presta_address->id_country);
          
         return EmsCustomer::createFromPrestaData(
