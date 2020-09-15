@@ -1,5 +1,14 @@
 # EMS Online plugin for Prestashop 1.7.x
 This is the offical EMS Online plugin.
+ 
+EMS Online Payment Solution
+ 
+* The ideal online payment page for your webshop.
+* Entirely in the style of your website, making transactions less likely to be terminated.
+* Working in the cloud, you won’t be bothered by updates.
+* Download your reports in the formats CAMT.053, MT940, MT940S & CODA.
+* Receive your VAT invoices via the 24/7 available online reporting tool.
+* See : https://emspay.nl/en/payment-solutions/online-payments
 
 ## About
 By integrating your webshop with EMS Online you can accept payments from your customers in an easy and trusted manner with all relevant payment methods supported.
