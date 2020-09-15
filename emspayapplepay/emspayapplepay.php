@@ -17,7 +17,7 @@ class emspayApplePay extends EmsPayPaymentModule
     public function __construct()
     {
         $this->name = 'emspayapplepay';
-	  $this->method_id = 'apple-pay';
+	    $this->method_id = 'apple-pay';
         parent::__construct();
         $this->displayName = $this->l('EMS Online Apple Pay');
         $this->description = $this->l('Accept payments for your products using Apple Pay.');

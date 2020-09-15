@@ -21,3 +21,8 @@
 * Add American Express
 * Add Tikkie Payment Request
 * Add WeChat
+
+** 1.3.0 **
+
+* Added the ability for AfterPay to be available in the selected countries.
+* Replaced locally stored ginger-php library on composer library installer.

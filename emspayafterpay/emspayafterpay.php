@@ -26,7 +26,7 @@ class emspayAfterpay extends EmsPayPaymentModule
     public function __construct()
     {
         $this->name = 'emspayafterpay';
-	  $this->method_id = 'afterpay';
+	    $this->method_id = 'afterpay';
         $this->useDemoApiKey = true;
         parent::__construct();
         $this->displayName = $this->l('EMS Online AfterPay');
@@ -41,6 +41,8 @@ class emspayAfterpay extends EmsPayPaymentModule
         if (!Configuration::get('EMS_PAY_APIKEY')) {
             throw new PrestaShopException('The webshop API key is missing in the emspay extension. Please add the API Key in the emspay extension, save it & then re-install this extension.');
         }
+        Configuration::updateValue('EMS_AFTERPAY_COUNTRY_ACCESS', trim('NL, BE'));
+
         if (!parent::install()
             || !$this->registerHook('paymentOptions')
             || !$this->registerHook('paymentReturn')
@@ -54,6 +56,9 @@ class emspayAfterpay extends EmsPayPaymentModule
 
     public function uninstall()
     {
+        Configuration::deleteByName('EMS_AFTERPAY_SHOW_FOR_IP');
+        Configuration::deleteByName('EMS_AFTERPAY_COUNTRY_ACCESS');
+
         if (!parent::uninstall()) {
             return false;
         }
@@ -83,6 +88,7 @@ class emspayAfterpay extends EmsPayPaymentModule
     {
         if (Tools::isSubmit('btnSubmit')) {
             Configuration::updateValue('EMS_AFTERPAY_SHOW_FOR_IP', trim(Tools::getValue('EMS_AFTERPAY_SHOW_FOR_IP')));
+            Configuration::updateValue('EMS_AFTERPAY_COUNTRY_ACCESS', trim(Tools::getValue('EMS_AFTERPAY_COUNTRY_ACCESS')));
         }
         return $this->displayConfirmation($this->l('Settings updated'));
     }
@@ -107,6 +113,13 @@ class emspayAfterpay extends EmsPayPaymentModule
                         'name' => 'EMS_AFTERPAY_SHOW_FOR_IP',
                         'required' => true,
                         'desc' => $this->l('You can specify specific IP addresses for which AfterPay is visible, for example if you want to test AfterPay you can type IP addresses as 128.0.0.1, 255.255.255.255. If you fill in nothing, then, AfterPay is visible to all IP addresses.'),
+                    ),
+                    array(
+                        'type' => 'text',
+                        'label' => $this->l('Countries available for AfterPay.'),
+                        'name' => 'EMS_AFTERPAY_COUNTRY_ACCESS',
+                        'required' => true,
+                        'desc' => $this->l('To allow AfterPay to be used for any other country just add its country code (in ISO 2 standard) to the "Countries available for AfterPay" field. Example: BE, NL, FR If field is empty then AfterPay will be available for all countries.'),
                     ),
                 ),
                 'submit' => array(
@@ -147,6 +160,10 @@ class emspayAfterpay extends EmsPayPaymentModule
                 'EMS_AFTERPAY_SHOW_FOR_IP',
                 Configuration::get('EMS_AFTERPAY_SHOW_FOR_IP')
             ),
+            'EMS_AFTERPAY_COUNTRY_ACCESS' => Tools::getValue(
+                'EMS_AFTERPAY_COUNTRY_ACCESS',
+                Configuration::get('EMS_AFTERPAY_COUNTRY_ACCESS')
+            )
         );
     }
     
@@ -155,11 +172,9 @@ class emspayAfterpay extends EmsPayPaymentModule
         if (!$this->active) {
             return;
         }
-        
         if (!$this->checkCurrency($params['cart'])) {
             return;
         }
-        
         if ($this->isSetShowForIpFilter()) {
             return;
         }
@@ -176,6 +191,9 @@ class emspayAfterpay extends EmsPayPaymentModule
         $paymentOption->setAction($this->context->link->getModuleLink($this->name, 'payment'));
         $paymentOption->setModuleName($this->name);
         $userCountry = $this->getUserCountryFromAddressId($params['cart']->id_address_invoice);
+        if (!$this->CountryAccess($params['cart']->id_address_invoice)){
+            return;
+        }
         if ($this->isValidCountry($userCountry)) {
             $this->context->smarty->assign('terms_and_condition_url', $this->getTermsAndConditionUrlByCountryIsoLocale($userCountry));
             $paymentOption->setForm($this->context->smarty->fetch('module:' . $this->name . '/views/templates/hook/payment.tpl'));
@@ -239,6 +257,23 @@ class emspayAfterpay extends EmsPayPaymentModule
             return self::TERMS_CONDITION_URL_BE;
         }
         return self::TERMS_CONDITION_URL_NL;
+    }
+
+    /**
+     * check if the EMS_AFTERPAY_COUNTY_ACCESS is set,
+     * if so, only display if user is from that counties
+     *
+     * @return boolean
+     */
+    protected function CountryAccess($idusercountry)
+    {
+        $ems_afterpay_country_access = Configuration::get('EMS_AFTERPAY_COUNTRY_ACCESS');
+            if (empty($ems_afterpay_country_access)) {
+                return true;
+            } else {
+                $countrylist = array_map('trim', (explode(",", $ems_afterpay_country_access)));
+                return in_array($this->getUserCountryFromAddressId($idusercountry), $countrylist);
+            }
     }
     
     public function hookPaymentReturn($params)
@@ -358,6 +393,7 @@ class emspayAfterpay extends EmsPayPaymentModule
     {
         $presta_customer = new Customer((int) $cart->id_customer);
         $presta_address = new Address((int) $cart->id_address_invoice);
+        $presta_billing_address = new Address((int) $cart->id_address_invoice);
         $presta_country = new Country((int) $presta_address->id_country);
          
         return EmsCustomer::createFromPrestaData(

@@ -69,7 +69,7 @@ class Helper
      * @return bool|string
      */
     public static function getCaCertPath(){
-	  return realpath(_PS_MODULE_DIR_ . '/emspay/ginger-php/assets/cacert.pem');
+	  return realpath(_PS_MODULE_DIR_ . '/emspay/assets/cacert.pem');
     }
 
     /**

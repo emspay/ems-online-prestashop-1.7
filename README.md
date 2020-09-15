@@ -1,12 +1,21 @@
 # EMS Online plugin for Prestashop 1.7.x
 This is the offical EMS Online plugin.
+ 
+EMS Online Payment Solution
+ 
+* The ideal online payment page for your webshop.
+* Entirely in the style of your website, making transactions less likely to be terminated.
+* Working in the cloud, you won’t be bothered by updates.
+* Download your reports in the formats CAMT.053, MT940, MT940S & CODA.
+* Receive your VAT invoices via the 24/7 available online reporting tool.
+* See : https://emspay.nl/en/payment-solutions/online-payments
 
 ## About
 By integrating your webshop with EMS Online you can accept payments from your customers in an easy and trusted manner with all relevant payment methods supported.
 
 
 ## Version number
-Version 1.2.0
+Version 1.3.0
 
 
 ## Pre-requisites to install the plug-ins: 
@@ -44,6 +53,8 @@ To do this click on the “Configure” button of EMS Online Afterpay or EMS Onl
 
 Enter the IP addresses that you want to whitelist, separate the addresses by a comma (“,”). The payment method Afterpay / Klarna will only be presented to customers who use a whitelisted IP address.
 If you want to offer Afterpay / Klarna to all your customers, you can leave the field empty.
+
+Only for AfterPay payment: To allow AfterPay to be used for any other country just add its country code (in ISO 2 standard) to the "Countries available for AfterPay" field. Example: BE, NL, FR
 
 7. Once the modules are installed you can offer the payment methods in your webshop.
 8. Compatibility: PrestaShop 1.7
