@@ -2,6 +2,8 @@
 
 namespace Model\Emspay;
 
+require_once (_PS_MODULE_DIR_.'/emspay/model/Emspay/Emspay.php');
+
 /**
  * Emspay Row gateway
  *
