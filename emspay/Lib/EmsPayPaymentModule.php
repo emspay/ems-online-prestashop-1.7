@@ -6,8 +6,6 @@ use Ginger\Ginger;
 use Model\Emspay\Emspay;
 use Model\Emspay\EmspayGateway;
 
-require_once (_PS_MODULE_DIR_.'/emspay/model/Emspay/EmspayGateway.php');
-
 /**
  * Abstract EmsPay Payment Module
  *
