@@ -26,3 +26,7 @@
 
 * Added the ability for AfterPay to be available in the selected countries.
 * Replaced locally stored ginger-php library on composer library installer.
+
+** 1.3.1 **
+
+* Fixed displaying "Thank you page" after success payment

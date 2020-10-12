@@ -1,5 +1,5 @@
 <?php
-require_once(_PS_MODULE_DIR_ . '/emspay/emspay_module_bootstrap.php');
+require_once(_PS_MODULE_DIR_ . '/emspay/vendor/autoload.php');
 
 class emspayWeChatValidationModuleFrontController extends ModuleFrontController
 {
