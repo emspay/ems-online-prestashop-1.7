@@ -1,5 +1,11 @@
 {
     "require": {
         "gingerpayments/ginger-php": "^2.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Lib\\": "Lib/",
+            "Model\\": "model"
+        }
     }
 }
