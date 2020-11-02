@@ -15,7 +15,7 @@ By integrating your webshop with EMS Online you can accept payments from your cu
 
 
 ## Version number
-Version 1.3.1
+Version 1.3.2
 
 
 ## Pre-requisites to install the plug-ins: 
@@ -33,8 +33,6 @@ After installation, the module will move to Improve' > 'Modules' > 'Module Manag
 4. Configure the EMS Online module
 - Enable the cURL CA bundle option.
 This fixes a cURL SSL Certificate issue that appears in some web-hosting environments where you do not have access to the PHP.ini file and therefore are not able to update server certificates.
-- Leave the 'Include Webhook URL with every order' option enabled.
-The plugin can automatically generate a webhook URL when a message is sent to the EMS API for new orders. To enable this option select ‘Include Webhook URL with every order’.
 - Copy the API key
 - Are you offering Afterpay on your pay page? In that case copy the API Key of your test webshop in the Afterpay Test API Key.
 When your Afterpay application was approved an extra test webshop was created for you to use in your test with Afterpay. The name of this webshop starts with ‘TEST Afterpay’.
