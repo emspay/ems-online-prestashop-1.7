@@ -25,7 +25,7 @@ abstract class EmsPayPaymentModule extends \PaymentModule
     public function __construct()
     {
         $this->tab = 'payments_gateways';
-        $this->version = '1.3.1';
+        $this->version = '1.3.2';
         $this->author = 'Ginger Payments';
         $this->controllers = array('payment', 'validation');
         $this->is_eu_compatible = 1;
@@ -195,9 +195,7 @@ abstract class EmsPayPaymentModule extends \PaymentModule
      */
     protected function getWebhookUrl()
     {
-        return \Configuration::get('EMS_PAY_USE_WEBHOOK')
-            ? \_PS_BASE_URL_.\__PS_BASE_URI__.'modules/emspay/webhook.php'
-            : null;
+        return \_PS_BASE_URL_.\__PS_BASE_URI__.'modules/emspay/webhook.php';
     }
     
     /**

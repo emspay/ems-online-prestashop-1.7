@@ -74,7 +74,7 @@ class emspayApplePay extends EmsPayPaymentModule
     {
         $customer = $this->_createCustomer($cart, $locale);
         try {
-		$response = $this->ginger->createOrder([
+		$response = $this->ginger->createOrder(array_filter([
 		    'amount' => Helper::getAmountInCents($cart->getOrderTotal(true)),   // Amount in cents
 		    'currency' => $this->getPaymentCurrency(),                          // Currency
 		    'transactions' => [
@@ -88,7 +88,7 @@ class emspayApplePay extends EmsPayPaymentModule
 		    'customer' => $customer->toArray(),                                 // Customer information
 		    'extra' => ['plugin' => $this->getPluginVersion()],                 // Extra information
 		    'webhook_url' => $this->getWebhookUrl(),                            // Webhook URL
-		]);
+		]));
         } catch (\Exception $exception) {
             return Tools::displayError($exception->getMessage());
         }
