@@ -361,6 +361,10 @@ class emspayAfterpay extends EmsPayPaymentModule
         if ($response['status'] == 'error') {
             return Tools::displayError($response['transactions'][0]['reason']);
         }
+
+        if (in_array($response['status'] ,['processing', 'error'])) {
+            return Tools::displayError($response['transactions'][0]['reason']);
+        }
  
         if (!$response['id']) {
             return Tools::displayError("Error: Response did not include id!");
