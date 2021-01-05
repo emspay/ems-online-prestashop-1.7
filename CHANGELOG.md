@@ -35,3 +35,7 @@
 
 * Removed WebHook option from all payments.
 * Update plugin description.
+
+** 1.3.3 ** 
+
+* Edited status updates of orders.
