@@ -54,7 +54,6 @@ class emspay extends PaymentModule
         if (!parent::install()
             || !$emspay_install->createTables()
             || !$emspay_install->createOrderState()
-            || !$this->registerHook('actionProductCancel')
             || !$this->registerHook('OrderSlip')) {
             return false;
         }
@@ -230,54 +229,6 @@ class emspay extends PaymentModule
             }
         } catch
         (Exception $e) {
-            echo $e->getMessage();
-        }
-    }
-
-    /**
-     * Hook for product refund
-     */
-    public function hookActionProductCancel($params)
-    {
-        try {
-            $orderId = $params['order']->id;
-            $productPrice = filter_input(INPUT_POST, 'product_price_tax_incl', FILTER_VALIDATE_FLOAT);
-
-            $argsOrderDetails = array(
-                'id_order_detail' => array(
-                    'filter' => FILTER_VALIDATE_INT,
-                    'flags' => FILTER_REQUIRE_ARRAY
-                )
-            );
-            $orderDetailsInfo = filter_input_array(INPUT_POST, $argsOrderDetails);
-
-            $argsQuantity = array(
-                'cancelQuantity' => array(
-                    'filter' => FILTER_VALIDATE_INT,
-                    'flags' => FILTER_REQUIRE_ARRAY
-                )
-            );
-            $cancelQuantityPost = filter_input_array(INPUT_POST, $argsQuantity);
-            $cancelQuantity = $cancelQuantityPost['cancelQuantity'];
-
-            $productsPrice = 0;
-            $orderDetails = OrderDetail::getList((int) $params['order']->id);
-
-            foreach ($orderDetails as $orderDetail) {
-                if (in_array($orderDetail['id_order_detail'], $orderDetailsInfo['id_order_detail'])) {
-                    $productsPrice += $orderDetail['unit_price_tax_incl'] * $cancelQuantity[$orderDetail['id_order_detail']];
-                }
-            }
-
-            $cancelQuantity = array_shift($cancelQuantityPost['cancelQuantity']);
-            $amount = Helper::getAmountInCents($productPrice * $cancelQuantity);
-
-            $this->productRefund($orderId,
-                                 (int) $amount,
-                                 $params['order']->payment,
-                                 $params['order']->id_cart,
-                                 $params['order']->module, $orderDetailsInfo['id_order_detail']);
-        } catch (Exception $e) {
             echo $e->getMessage();
         }
     }
