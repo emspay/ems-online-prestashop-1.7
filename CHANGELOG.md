@@ -39,3 +39,7 @@
 ** 1.3.3 ** 
 
 * Edited status updates of orders.
+
+** 1.3.4 ** 
+
+* Added refund functionality.

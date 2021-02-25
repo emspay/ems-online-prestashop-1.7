@@ -3,6 +3,8 @@
 if (!defined('_PS_VERSION_')) {
     exit;
 }
+use Lib\Helper;
+use Ginger\Ginger;
 
 require_once(_PS_MODULE_DIR_ . '/emspay/vendor/autoload.php');
 
@@ -24,7 +26,7 @@ class emspay extends PaymentModule
     {
         $this->name = 'emspay';
         $this->tab = 'payments_gateways';
-        $this->version = '1.3.3';
+        $this->version = '1.3.4';
         $this->author = 'Ginger Payments';
         $this->controllers = array('payment', 'validation');
         $this->is_eu_compatible = 1;
@@ -49,7 +51,11 @@ class emspay extends PaymentModule
 
         $emspay_install = new emspayInstall();
 
-        if (!parent::install() || !$emspay_install->createTables() || !$emspay_install->createOrderState()) {
+        if (!parent::install()
+            || !$emspay_install->createTables()
+            || !$emspay_install->createOrderState()
+            || !$this->registerHook('actionProductCancel')
+            || !$this->registerHook('OrderSlip')) {
             return false;
         }
 
@@ -204,4 +210,164 @@ class emspay extends PaymentModule
 
         return (is_array($modules) && in_array(str_replace('emspay', '', $module), $modules));
     }
+
+    /**
+     * Hook for partial refund
+     */
+    public function hookOrderSlip($params)
+    {
+        try {
+            if (isset($_POST['partialRefundShippingCost'])) {
+                $partialRefund = filter_input(INPUT_POST, 'partialRefundShippingCost', FILTER_SANITIZE_STRING);
+                $amount = Helper::getAmountInCents((float) str_replace(',', '.', $partialRefund));
+                $orderId = $params['order']->id;
+
+                $this->productRefund($orderId,
+                                     (int) $amount,
+                                     $params['order']->payment,
+                                     $params['order']->id_cart,
+                                     $params['order']->module);
+            }
+        } catch
+        (Exception $e) {
+            echo $e->getMessage();
+        }
+    }
+
+    /**
+     * Hook for product refund
+     */
+    public function hookActionProductCancel($params)
+    {
+        try {
+            $orderId = $params['order']->id;
+            $productPrice = filter_input(INPUT_POST, 'product_price_tax_incl', FILTER_VALIDATE_FLOAT);
+
+            $argsOrderDetails = array(
+                'id_order_detail' => array(
+                    'filter' => FILTER_VALIDATE_INT,
+                    'flags' => FILTER_REQUIRE_ARRAY
+                )
+            );
+            $orderDetailsInfo = filter_input_array(INPUT_POST, $argsOrderDetails);
+
+            $argsQuantity = array(
+                'cancelQuantity' => array(
+                    'filter' => FILTER_VALIDATE_INT,
+                    'flags' => FILTER_REQUIRE_ARRAY
+                )
+            );
+            $cancelQuantityPost = filter_input_array(INPUT_POST, $argsQuantity);
+            $cancelQuantity = $cancelQuantityPost['cancelQuantity'];
+
+            $productsPrice = 0;
+            $orderDetails = OrderDetail::getList((int) $params['order']->id);
+
+            foreach ($orderDetails as $orderDetail) {
+                if (in_array($orderDetail['id_order_detail'], $orderDetailsInfo['id_order_detail'])) {
+                    $productsPrice += $orderDetail['unit_price_tax_incl'] * $cancelQuantity[$orderDetail['id_order_detail']];
+                }
+            }
+
+            $cancelQuantity = array_shift($cancelQuantityPost['cancelQuantity']);
+            $amount = Helper::getAmountInCents($productPrice * $cancelQuantity);
+
+            $this->productRefund($orderId,
+                                 (int) $amount,
+                                 $params['order']->payment,
+                                 $params['order']->id_cart,
+                                 $params['order']->module, $orderDetailsInfo['id_order_detail']);
+        } catch (Exception $e) {
+            echo $e->getMessage();
+        }
+    }
+
+    /**
+     * Refund EMS product
+     */
+    public function productRefund($orderId, $amount, $paymentMethod, $cartId, $moduleName, $orderDetails = null)
+    {
+        $query = Db::getInstance()->getRow("SELECT ginger_order_id FROM `" . _DB_PREFIX_ . "emspay` WHERE `id_cart` = " . $cartId);
+        $emsOrderId = $query['ginger_order_id'];
+
+        $ginger = $this->createGingerClient($moduleName);
+        $emsOrder = $ginger->getOrder($emsOrderId);
+
+        if ($emsOrder['status'] != 'completed') {
+            throw new Exception($paymentMethod . ': ' . $this->l('Only completed orders can be refunded.'));
+        }
+
+        $refund_data = [
+            'amount' => $amount,
+            'description' => 'OrderID: #' . $orderId
+        ];
+
+        if ($moduleName == 'emspayklarnapaylater' || $moduleName == 'emspayafterpay') {
+            $order = new Order((int) $orderId);
+            $products = $order->getProducts();
+            foreach ($products as $idOrderDetail => $product) {
+                if (in_array($idOrderDetail, $orderDetails)) {
+                    $refund_data['order_lines'] = array_filter([
+                                                                   'ean' => $product['product_ean13'],
+                                                                   'url' => $this->context->link->getProductLink($product),
+                                                                   'name' => $product['product_name'],
+                                                                   'type' => Helper::PHYSICAL,
+                                                                   'amount' => Helper::getAmountInCents(Tools::ps_round($product['price_wt'],
+                                                                                                                              2)),
+                                                                   'currency' => Helper::getPaymentCurrency(),
+                                                                   'quantity' => (int) $product['cart_quantity'],
+                                                                   'image_url' => $this->getProductCoverImage($product),
+                                                                   'vat_percentage' => ((int) $product['tax_rate'] * 100),
+                                                                   'merchant_order_line_id' => $product['product_id']
+                                                               ],
+                        function ($var)
+                        {
+                            return !is_null($var);
+                        });
+                }
+            }
+
+            if (!isset($emsOrder['transactions']['flags']['has-captures'])) {
+                throw new Exception($paymentMethod . ': ' . $this->l('Refunds only possible when captured.'));
+            };
+        }
+        $ems_refund_order = $ginger->refundOrder($emsOrder['id'], $refund_data);
+
+        if (in_array($ems_refund_order['status'], ['error', 'cancelled', 'expired'])) {
+            if (isset(current($ems_refund_order['transactions'])['reason'])) {
+                throw new Exception($paymentMethod . ': ' . current($ems_refund_order['transactions'])['reason']);
+            }
+            throw new Exception($paymentMethod . ': ' . $this->l('Refund order is not completed.'));
+        }
+    }
+
+    protected function createGingerClient($moduleName)
+    {
+        try {
+            $apiKey = $this->apiKeyResolver($moduleName);
+            return Ginger::createClient(
+                Helper::GINGER_ENDPOINT,
+                $apiKey,
+                (null !== \Configuration::get('EMS_PAY_BUNDLE_CA')) ?
+                    [
+                        CURLOPT_CAINFO => Helper::getCaCertPath()
+                    ] : []
+            );
+        } catch (\Exception $exception) {
+            $this->warning = $exception->getMessage();
+        }
+    }
+
+    protected function apiKeyResolver($moduleName)
+    {
+        if ($moduleName === 'emspayklarnapaylater' && !empty(\Configuration::get('EMS_PAY_APIKEY_TEST'))) {
+            return \Configuration::get('EMS_PAY_APIKEY_TEST');
+        }
+
+        if ($moduleName === 'emspayafterpay' && !empty(\Configuration::get('EMS_PAY_AFTERPAY_APIKEY_TEST'))) {
+            return \Configuration::get('EMS_PAY_AFTERPAY_APIKEY_TEST');
+        }
+        return \Configuration::get('EMS_PAY_APIKEY');
+    }
+
 }

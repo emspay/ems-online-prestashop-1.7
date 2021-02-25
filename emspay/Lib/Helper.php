@@ -85,4 +85,11 @@ class Helper
 
 	  return $orderData;
     }
+    /**
+     * @return string
+     */
+    public static function getPaymentCurrency()
+    {
+        return 'EUR';
+    }
 }
