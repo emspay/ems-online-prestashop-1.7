@@ -217,7 +217,7 @@ class emspay extends PaymentModule
     {
         try {
             if (isset($_POST['partialRefundShippingCost'])) {
-                $partialRefund = filter_input(INPUT_POST, 'partialRefundShippingCost', FILTER_SANITIZE_STRING);
+                $partialRefund = filter_input(INPUT_POST, 'product_price_tax_incl', FILTER_SANITIZE_STRING);
                 $amount = Helper::getAmountInCents((float) str_replace(',', '.', $partialRefund));
                 $orderId = $params['order']->id;
 
