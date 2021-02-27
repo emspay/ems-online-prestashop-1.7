@@ -101,7 +101,7 @@ if (!empty($order_details)) {
         }
         echo "WEBHOOK: update database; set id_order to: ".$id_order."\n";
 
-        Db::getInstance()->update('emspay', array("id_order" => $id_order),
+        Db::getInstance()->update('emspay', array("id_order" => (string)$id_order),
             '`ginger_order_id` = "'.Db::getInstance()->escape($ginger_order_id).'"');
 
         $order_details['merchant_order_id'] = $id_order;
