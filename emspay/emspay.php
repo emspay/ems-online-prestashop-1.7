@@ -4,11 +4,11 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 use Lib\Helper;
-use Ginger\Ginger;
+use Lib\EmsPayPaymentModule;
 
 require_once(_PS_MODULE_DIR_ . '/emspay/vendor/autoload.php');
 
-class emspay extends PaymentModule
+class emspay extends EmsPayPaymentModule
 {
     private $_html = '';
     private $_postErrors = array();
@@ -240,8 +240,7 @@ class emspay extends PaymentModule
         $query = Db::getInstance()->getRow("SELECT ginger_order_id FROM `" . _DB_PREFIX_ . "emspay` WHERE `id_cart` = " . $cartId);
         $emsOrderId = $query['ginger_order_id'];
 
-        $ginger = $this->createGingerClient($moduleName);
-        $emsOrder = $ginger->getOrder($emsOrderId);
+        $emsOrder = $this->ginger->getOrder($emsOrderId);
 
         if ($emsOrder['status'] != 'completed') {
             throw new Exception($paymentMethod . ': ' . $this->l('Only completed orders can be refunded.'));
@@ -264,7 +263,7 @@ class emspay extends PaymentModule
                                                                    'type' => Helper::PHYSICAL,
                                                                    'amount' => Helper::getAmountInCents(Tools::ps_round($product['price_wt'],
                                                                                                                               2)),
-                                                                   'currency' => Helper::getPaymentCurrency(),
+                                                                   'currency' => $this->getPaymentCurrency(),
                                                                    'quantity' => (int) $product['cart_quantity'],
                                                                    'image_url' => $this->getProductCoverImage($product),
                                                                    'vat_percentage' => ((int) $product['tax_rate'] * 100),
@@ -290,34 +289,4 @@ class emspay extends PaymentModule
             throw new Exception($paymentMethod . ': ' . $this->l('Refund order is not completed.'));
         }
     }
-
-    protected function createGingerClient($moduleName)
-    {
-        try {
-            $apiKey = $this->apiKeyResolver($moduleName);
-            return Ginger::createClient(
-                Helper::GINGER_ENDPOINT,
-                $apiKey,
-                (null !== \Configuration::get('EMS_PAY_BUNDLE_CA')) ?
-                    [
-                        CURLOPT_CAINFO => Helper::getCaCertPath()
-                    ] : []
-            );
-        } catch (\Exception $exception) {
-            $this->warning = $exception->getMessage();
-        }
-    }
-
-    protected function apiKeyResolver($moduleName)
-    {
-        if ($moduleName === 'emspayklarnapaylater' && !empty(\Configuration::get('EMS_PAY_APIKEY_TEST'))) {
-            return \Configuration::get('EMS_PAY_APIKEY_TEST');
-        }
-
-        if ($moduleName === 'emspayafterpay' && !empty(\Configuration::get('EMS_PAY_AFTERPAY_APIKEY_TEST'))) {
-            return \Configuration::get('EMS_PAY_AFTERPAY_APIKEY_TEST');
-        }
-        return \Configuration::get('EMS_PAY_APIKEY');
-    }
-
 }

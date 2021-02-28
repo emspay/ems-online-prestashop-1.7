@@ -1,6 +1,13 @@
 <?php
 include dirname(__FILE__).'/../../config/config.inc.php';
 
+global $kernel;
+if(!$kernel){
+    require_once _PS_ROOT_DIR_.'/app/AppKernel.php';
+    $kernel = new \AppKernel('prod', false);
+    $kernel->boot();
+}
+
 $payment_method_mapping = array(
     "bank-transfer" => "Bank Transfer",
     "ideal" => "iDEAL",
@@ -101,10 +108,10 @@ if (!empty($order_details)) {
         }
         echo "WEBHOOK: update database; set id_order to: ".$id_order."\n";
 
-        Db::getInstance()->update('emspay', array("id_order" => (string)$id_order),
+        Db::getInstance()->update('emspay', array("id_order" => $id_order),
             '`ginger_order_id` = "'.Db::getInstance()->escape($ginger_order_id).'"');
 
-        $order_details['merchant_order_id'] = $id_order;
+        $order_details['merchant_order_id'] = (string)$id_order;
         $emspay->ginger()->updateOrder($ginger_order_id, $order_details);
     }
 }
