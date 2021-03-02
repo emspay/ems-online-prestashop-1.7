@@ -3,10 +3,12 @@
 if (!defined('_PS_VERSION_')) {
     exit;
 }
+use Lib\Helper;
+use Lib\EmsPayPaymentModule;
 
 require_once(_PS_MODULE_DIR_ . '/emspay/vendor/autoload.php');
 
-class emspay extends PaymentModule
+class emspay extends EmsPayPaymentModule
 {
     private $_html = '';
     private $_postErrors = array();
@@ -24,7 +26,7 @@ class emspay extends PaymentModule
     {
         $this->name = 'emspay';
         $this->tab = 'payments_gateways';
-        $this->version = '1.3.3';
+        $this->version = '1.3.4';
         $this->author = 'Ginger Payments';
         $this->controllers = array('payment', 'validation');
         $this->is_eu_compatible = 1;
@@ -49,7 +51,10 @@ class emspay extends PaymentModule
 
         $emspay_install = new emspayInstall();
 
-        if (!parent::install() || !$emspay_install->createTables() || !$emspay_install->createOrderState()) {
+        if (!parent::install()
+            || !$emspay_install->createTables()
+            || !$emspay_install->createOrderState()
+            || !$this->registerHook('OrderSlip')) {
             return false;
         }
 
@@ -203,5 +208,85 @@ class emspay extends PaymentModule
         $modules = json_decode(Configuration::get('PAY_ENABLED_MODULES'));
 
         return (is_array($modules) && in_array(str_replace('emspay', '', $module), $modules));
+    }
+
+    /**
+     * Hook for partial refund
+     */
+    public function hookOrderSlip($params)
+    {
+        try {
+            if (isset($_POST['partialRefundShippingCost'])) {
+                $partialRefund = filter_input(INPUT_POST, 'product_price_tax_incl', FILTER_SANITIZE_STRING);
+                $amount = Helper::getAmountInCents((float) str_replace(',', '.', $partialRefund));
+                $orderId = $params['order']->id;
+
+                $this->productRefund($orderId,
+                                     (int) $amount,
+                                     $params['order']->payment,
+                                     $params['order']->id_cart,
+                                     $params['order']->module);
+            }
+        } catch (Exception $e) {
+            echo $e->getMessage();
+        }
+    }
+
+    /**
+     * Refund EMS product
+     */
+    public function productRefund($orderId, $amount, $paymentMethod, $cartId, $moduleName, $orderDetails = null)
+    {
+        $query = Db::getInstance()->getRow("SELECT ginger_order_id FROM `" . _DB_PREFIX_ . "emspay` WHERE `id_cart` = " . $cartId);
+        $emsOrderId = $query['ginger_order_id'];
+
+        $emsOrder = $this->ginger->getOrder($emsOrderId);
+
+        if ($emsOrder['status'] != 'completed') {
+            throw new Exception($paymentMethod . ': ' . $this->l('Only completed orders can be refunded.'));
+        }
+
+        $refund_data = [
+            'amount' => $amount,
+            'description' => 'OrderID: #' . $orderId
+        ];
+
+        if ($moduleName == 'emspayklarnapaylater' || $moduleName == 'emspayafterpay') {
+            $order = new Order((int) $orderId);
+            $products = $order->getProducts();
+            foreach ($products as $idOrderDetail => $product) {
+                if (in_array($idOrderDetail, $orderDetails)) {
+                    $refund_data['order_lines'] = array_filter([
+                                                                   'ean' => $product['product_ean13'],
+                                                                   'url' => $this->context->link->getProductLink($product),
+                                                                   'name' => $product['product_name'],
+                                                                   'type' => Helper::PHYSICAL,
+                                                                   'amount' => Helper::getAmountInCents(Tools::ps_round($product['price_wt'],
+                                                                                                                              2)),
+                                                                   'currency' => $this->getPaymentCurrency(),
+                                                                   'quantity' => (int) $product['cart_quantity'],
+                                                                   'image_url' => $this->getProductCoverImage($product),
+                                                                   'vat_percentage' => ((int) $product['tax_rate'] * 100),
+                                                                   'merchant_order_line_id' => $product['product_id']
+                                                               ],
+                        function ($var)
+                        {
+                            return !is_null($var);
+                        });
+                }
+            }
+
+            if (!isset($emsOrder['transactions']['flags']['has-captures'])) {
+                throw new Exception($paymentMethod . ': ' . $this->l('Refunds only possible when captured.'));
+            };
+        }
+        $ems_refund_order = $ginger->refundOrder($emsOrder['id'], $refund_data);
+
+        if (in_array($ems_refund_order['status'], ['error', 'cancelled', 'expired'])) {
+            if (isset(current($ems_refund_order['transactions'])['reason'])) {
+                throw new Exception($paymentMethod . ': ' . current($ems_refund_order['transactions'])['reason']);
+            }
+            throw new Exception($paymentMethod . ': ' . $this->l('Refund order is not completed.'));
+        }
     }
 }
