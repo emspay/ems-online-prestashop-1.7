@@ -8,7 +8,7 @@
         {l s='Please wait while your order status is being checked...' mod='emspay'}
     </h3>
 
-    <div><img src="{$modules_dir}emspay/ajax-loader.gif"/></div>
+    <div><img src="{$modules_dir}ginger/assets/ajax-loader.gif"/></div>
 
     <script language="JavaScript">
         {literal}
@@ -16,5 +16,5 @@
             var validation_url = '{/literal}{$validation_url}{literal}';
         {/literal}
     </script>
-    <script type="text/javascript" src="{$modules_dir}emspay/processing.js"></script>
+    <script type="text/javascript" src="{$modules_dir}ginger/processing.js"></script>
 {/block}
