@@ -26,7 +26,7 @@ class GingerBankConfig
         'google-pay' => 'Google Pay'
     ];
 
-    const PLUGIN_NAME = 'ems-online-prestashop-1.7';
+    const PLUGIN_NAME = 'emspay-online-prestashop-1.7';
     const BANK_LABEL = 'EMS Online';
     const BANK_PREFIX = 'emspay';
     const GINGER_BANK_ENDPOINT = 'https://api.online.emspay.eu';
