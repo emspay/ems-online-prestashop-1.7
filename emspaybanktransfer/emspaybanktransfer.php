@@ -2,6 +2,7 @@
 
 use Lib\banktwins\GingerBankGateway;
 use Lib\interfaces\GingerIdentificationPay;
+use Lib\components\GingerInstallTrait;
 
 if (!defined('_PS_VERSION_')) {
     exit;
@@ -11,6 +12,8 @@ require_once(_PS_MODULE_DIR_ . '/ginger/vendor/autoload.php');
 
 class emspaybanktransfer extends GingerBankGateway implements GingerIdentificationPay
 {
+    use GingerInstallTrait;
+
     public function __construct()
     {
         $this->name = 'emspaybanktransfer';

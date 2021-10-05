@@ -3,6 +3,7 @@
 use Lib\banktwins\GingerBankGateway;
 use Lib\interfaces\GingerCustomFieldsOnCheckout;
 use Lib\interfaces\GingerIssuers;
+use Lib\components\GingerInstallTrait;
 
 if (!defined('_PS_VERSION_')) {
     exit;
@@ -12,6 +13,8 @@ require_once(_PS_MODULE_DIR_ . '/ginger/vendor/autoload.php');
 
 class emspayideal extends GingerBankGateway implements GingerIssuers, GingerCustomFieldsOnCheckout
 {
+    use GingerInstallTrait;
+
     public function __construct()
     {
         $this->name = 'emspayideal';

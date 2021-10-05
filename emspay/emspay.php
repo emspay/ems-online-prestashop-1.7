@@ -15,7 +15,6 @@ class emspay extends GingerBankGateway
 {
 
     use GingerConfigurableTrait;
-    private $_postErrors = array();
     public $extra_mail_vars;
 
     public function __construct()

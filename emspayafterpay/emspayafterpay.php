@@ -4,6 +4,7 @@
 use Lib\banktwins\GingerBankGateway;
 use Lib\components\GingerConfigurableTrait;
 use Lib\components\GingerOrderLinesTrait;
+use Lib\components\GingerInstallTrait;
 use Lib\interfaces\GingerCapturable;
 use Lib\interfaces\GingerCountryValidation;
 use Lib\interfaces\GingerCustomFieldsOnCheckout;
@@ -30,7 +31,7 @@ class emspayafterpay extends GingerBankGateway implements
     
     protected $allowedLocales = ['NL', 'BE'];
 
-    use GingerConfigurableTrait, GingerOrderLinesTrait;
+    use GingerConfigurableTrait, GingerOrderLinesTrait, GingerInstallTrait;
 
     public function __construct()
     {

@@ -6,6 +6,7 @@ use Lib\components\GingerOrderLinesTrait;
 use Lib\interfaces\GingerCapturable;
 use Lib\interfaces\GingerIPValidation;
 use Lib\interfaces\GingerOrderLines;
+use Lib\components\GingerInstallTrait;
 
 if (!defined('_PS_VERSION_')) {
     exit;
@@ -16,7 +17,7 @@ require_once(_PS_MODULE_DIR_ . '/ginger/vendor/autoload.php');
 
 class emspayKlarnaPayLater extends GingerBankGateway implements GingerCapturable, GingerIPValidation, GingerOrderLines
 {
-    use GingerConfigurableTrait, GingerOrderLinesTrait;
+    use GingerConfigurableTrait, GingerOrderLinesTrait, GingerInstallTrait;
     public function __construct()
     {
         $this->name = 'emspayklarnapaylater';
