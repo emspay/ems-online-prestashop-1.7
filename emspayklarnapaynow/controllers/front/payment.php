@@ -1,11 +1,10 @@
 <?php
 
-require_once(_PS_MODULE_DIR_ . '/emspay/vendor/autoload.php');
+use Lib\banktwins\GingerBankPaymentFrontController;
 
-class emspayKlarnaPayNowPaymentModuleFrontController extends ModuleFrontController
+require_once(_PS_MODULE_DIR_ . '/ginger/vendor/autoload.php');
+
+class emspayKlarnaPayNowPaymentModuleFrontController extends GingerBankPaymentFrontController
 {
-    public $ssl = true;
-    public $display_column_left = false;
 
-    use Lib\EmsPayPaymentModuleFrontControllerTrait;
 }

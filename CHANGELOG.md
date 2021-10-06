@@ -43,3 +43,16 @@
 ** 1.3.4 ** 
 
 * Added refund functionality.
+  
+** 1.4.0 **
+
+* Refactored code to handle GPE solution.
+* Unified bank labels to handle GPE solution.
+* Added Bank Config class.
+* Added Bank Twins for handling custom bank functionality requests.
+* Implemented GitHubActions.
+* Added AfterMerge & CreateOrder PHPUnit tests.
+* Added Sofort, Klarna Direct Debit, Google Pay payment methods
+* Implemented multi-currency
+* Fixed bugs in refund&capture functionality
+* Updated the extra field in an order

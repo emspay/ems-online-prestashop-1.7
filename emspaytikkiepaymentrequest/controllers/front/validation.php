@@ -1,8 +1,9 @@
 <?php
 
-require_once(_PS_MODULE_DIR_ . '/emspay/vendor/autoload.php');
+use Lib\banktwins\GingerBankValidationFrontController;
 
-class emspayTikkiePaymentRequestValidationModuleFrontController extends ModuleFrontController
+require_once(_PS_MODULE_DIR_ . '/ginger/vendor/autoload.php');
+
+class emspayTikkiePaymentRequestValidationModuleFrontController extends GingerBankValidationFrontController
 {
-    use Lib\EmsPayValidationTrait;
 }
