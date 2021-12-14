@@ -36,14 +36,14 @@
 * Removed WebHook option from all payments.
 * Update plugin description.
 
-** 1.3.3 ** 
+** 1.3.3 **
 
 * Edited status updates of orders.
 
-** 1.3.4 ** 
+** 1.3.4 **
 
 * Added refund functionality.
-  
+
 ** 1.4.0 **
 
 * Refactored code to handle GPE solution.
@@ -56,3 +56,13 @@
 * Implemented multi-currency
 * Fixed bugs in refund&capture functionality
 * Updated the extra field in an order
+
+** 1.4.1 **
+
+* Added possibility to install the plugin through admin panel
+* Added Apple Pay detection
+* Fixed bug: Error message appears when user enters API key for the first time
+* Added default list of currencies with EUR
+* Added OrderLines in each ginger order
+* Updated current ‘can be captured’ check using capturable field from gingerOrder array
+* Unified titles

@@ -2,22 +2,20 @@
 
 use Lib\banktwins\GingerBankGateway;
 use Lib\components\GingerConfigurableTrait;
-use Lib\components\GingerOrderLinesTrait;
 use Lib\interfaces\GingerCapturable;
 use Lib\interfaces\GingerIPValidation;
-use Lib\interfaces\GingerOrderLines;
 use Lib\components\GingerInstallTrait;
 
 if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-require_once(_PS_MODULE_DIR_ . '/ginger/vendor/autoload.php');
+require_once(\_PS_MODULE_DIR_ . 'emspay/ginger/vendor/autoload.php');
 
 
-class emspayKlarnaPayLater extends GingerBankGateway implements GingerCapturable, GingerIPValidation, GingerOrderLines
+class emspayKlarnaPayLater extends GingerBankGateway implements GingerCapturable, GingerIPValidation
 {
-    use GingerConfigurableTrait, GingerOrderLinesTrait, GingerInstallTrait;
+    use GingerConfigurableTrait, GingerInstallTrait;
     public function __construct()
     {
         $this->name = 'emspayklarnapaylater';

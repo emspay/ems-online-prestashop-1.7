@@ -3,24 +3,21 @@
 
 use Lib\banktwins\GingerBankGateway;
 use Lib\components\GingerConfigurableTrait;
-use Lib\components\GingerOrderLinesTrait;
 use Lib\components\GingerInstallTrait;
 use Lib\interfaces\GingerCapturable;
 use Lib\interfaces\GingerCountryValidation;
 use Lib\interfaces\GingerCustomFieldsOnCheckout;
 use Lib\interfaces\GingerIPValidation;
-use Lib\interfaces\GingerOrderLines;
 
 if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-require_once(_PS_MODULE_DIR_ . '/ginger/vendor/autoload.php');
+require_once(\_PS_MODULE_DIR_ . 'emspay/ginger/vendor/autoload.php');
 
 
 class emspayafterpay extends GingerBankGateway implements
     GingerCountryValidation,
-    GingerOrderLines,
     GingerIPValidation,
     GingerCapturable,
     GingerCustomFieldsOnCheckout
@@ -31,7 +28,7 @@ class emspayafterpay extends GingerBankGateway implements
     
     protected $allowedLocales = ['NL', 'BE'];
 
-    use GingerConfigurableTrait, GingerOrderLinesTrait, GingerInstallTrait;
+    use GingerConfigurableTrait, GingerInstallTrait;
 
     public function __construct()
     {

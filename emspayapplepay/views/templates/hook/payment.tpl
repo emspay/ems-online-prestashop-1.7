@@ -1,41 +1,21 @@
-<style>
-a.emspayapplepay::after {
-      display: block;
-      content: "\f054";
-      position: absolute;
-      right: 15px;
-      margin-top: -11px;
-      top: 50%;
-      font-family: "FontAwesome";
-      font-size: 25px;
-      height: 22px;
-      width: 14px;
-      color: #777;
-}
-a.emspayapplepay{
-      padding-left: 0px !important;
-}
-span.applelogo{
-      margin-left: 15px;
-}
-span.applelogo img{
-      width: 64px;
-      height: auto;
-}
-span.appletitle{
-      padding-left: 20px;
-
-a.emspayapplepay {
-      background: url({$base_dir}modules/emspayapplepay/logo.png) 15px 12px no-repeat
-}
-</style>
 <div class="row">
       <div class="col-xs-12">
-            <p class="payment_module">
-                  <a class="emspayapplepay" href="{$link->getModuleLink('emspayapplepay', 'payment')|escape:'html'}" title="{l s='Pay by Apple Pay' mod='emspayapplepay'}">
-                        <span class="applelogo"><img src={$base_dir}modules/emspayapplepay/logo_bestelling.png></span>
-                        <span class="appletitle">{l s='Pay by Apple Pay' mod='emspayapplepay'}<span>
-                  </a>
-            </p>
+            <div class="payment_module">
+                  <div class='emspayapplepay'>
+                        <form id="emspayapplepay_form" name="emspayapplepay_form" action="{$link->getModuleLink('emspayapplepay', 'payment')|escape:'html'}" method="post">
+                              <p id="ginger_notification"></p>
+                        </form>
+                  </div>
+            </div>
       </div>
 </div>
+<script type="text/javascript">
+
+      var applepay_isnt_available = "{l s='Apple Pay is not available for your device' mod='emspayapplepay' js=1}";
+
+      if(!window.ApplePaySession)
+      {
+            document.getElementById('ginger_notification').textContent = applepay_isnt_available
+      }
+
+</script>

@@ -1,0 +1,16 @@
+{
+    "require": {
+        "gingerpayments/ginger-php": "^2.2"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.3.7"
+    },
+    "autoload": {
+        "psr-4": {
+            "Lib\\components\\": "Lib/components",
+            "Lib\\banktwins\\": "Lib/banktwins",
+            "Model\\": "model",
+            "Lib\\interfaces\\": "Lib/interfaces"
+        }
+    }
+}
