@@ -8,6 +8,7 @@ use Lib\interfaces\GingerCapturable;
 use Lib\interfaces\GingerCountryValidation;
 use Lib\interfaces\GingerCustomFieldsOnCheckout;
 use Lib\interfaces\GingerIPValidation;
+use Lib\interfaces\GingerTermsAndConditions;
 
 if (!defined('_PS_VERSION_')) {
     exit;
@@ -20,12 +21,11 @@ class emspayafterpay extends GingerBankGateway implements
     GingerCountryValidation,
     GingerIPValidation,
     GingerCapturable,
-    GingerCustomFieldsOnCheckout
+    GingerCustomFieldsOnCheckout,
+    GingerTermsAndConditions
 {
-    const TERMS_CONDITION_URL_NL = 'https://www.afterpay.nl/nl/algemeen/betalen-met-afterpay/betalingsvoorwaarden';
-    const TERMS_CONDITION_URL_BE = 'https://www.afterpay.be/be/footer/betalen-met-afterpay/betalingsvoorwaarden';
     const BE_ISO_CODE = 'BE';
-    
+
     protected $allowedLocales = ['NL', 'BE'];
 
     use GingerConfigurableTrait, GingerInstallTrait;
