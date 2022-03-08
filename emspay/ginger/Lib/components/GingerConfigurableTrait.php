@@ -56,6 +56,8 @@ trait GingerConfigurableTrait
                 \Configuration::updateValue('GINGER_KLARNAPAYLATER_TEST_API_KEY', trim(\Tools::getValue('GINGER_KLARNAPAYLATER_TEST_API_KEY')));
                 \Configuration::updateValue('GINGER_AFTERPAY_TEST_API_KEY', trim(\Tools::getValue('GINGER_AFTERPAY_TEST_API_KEY')));
                 \Configuration::updateValue('GINGER_BUNDLE_CA', \Tools::getValue('GINGER_BUNDLE_CA'));
+
+                $this->cacheCurrencyList();
             }
         }
         $this->_html .= $this->displayConfirmation($this->l('Settings updated'));

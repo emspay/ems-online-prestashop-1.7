@@ -66,3 +66,9 @@
 * Added OrderLines in each ginger order
 * Updated current ‘can be captured’ check using capturable field from gingerOrder array
 * Unified titles
+
+** 1.4.2 **
+
+* Added possibility to skip the intermediate page with terms of condition in AfterPay
+* Removed unavailable payment methods
+* Added caching the array of currency

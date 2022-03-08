@@ -1,6 +1,7 @@
 <?php
 namespace Lib\components;
 
+use Lib\interfaces\GingerTermsAndConditions;
 use Lib\interfaces\GingerIssuers;
 
 class GingerOrderBuilder
@@ -43,17 +44,7 @@ class GingerOrderBuilder
         $order['customer'] = $this->getCustomerInformation();
         $order['extra'] = $this->getExtra();
         $order['webhook_url'] = $this->getWebhookURL();
-        $transactions = $this->getOrderTransactions();
-
-        if ($this->paymentMethod instanceof GingerIssuers)
-        {
-            $transactions = array_merge(
-                $transactions,
-                array_filter(['payment_method_details' => ['issuer_id' => $this->getSelectedIssuer()]])
-            );
-        }
-
-        $order['transactions'][] = $transactions;
+        $order['transactions'][] = $this->getOrderTransactions();
         $order['order_lines'] = $this->getOrderLines($this->cart);
 
         return $order;
@@ -285,12 +276,48 @@ class GingerOrderBuilder
         ];
     }
 
-    public function getOrderTransactions()
+    /**
+     * Function returns transaction array
+     * @return array
+     * @throws Exception
+     */
+    public function getOrderTransactions(): array
     {
-        return [
-            'payment_method' => $this->getPaymentMethod()
-        ];
+        return array_filter([
+            'payment_method' => $this->getPaymentMethod(),
+            'payment_method_details' => $this->getPaymentMethodDetails()
+        ]);
     }
+
+    /**
+     */
+    public function getPaymentMethodDetails(): array
+    {
+        $paymentMethodDetails = [];
+
+        //uses for ideal
+        if ($this->paymentMethod instanceof GingerIssuers)
+        {
+            $paymentMethodDetails['issuer_id'] = $this->getSelectedIssuer();
+            return $paymentMethodDetails;
+        }
+
+        //uses for afterpay
+        if ($this->paymentMethod instanceof GingerTermsAndConditions)
+        {
+            $termsAndConditionFlag = filter_input(INPUT_POST, GingerBankConfig::BANK_PREFIX.'afterpay_terms_conditions');
+            if ($termsAndConditionFlag)
+            {
+                $paymentMethodDetails = [
+                    'verified_terms_of_service' => true,
+                ];
+            }
+            return $paymentMethodDetails;
+        }
+
+        return $paymentMethodDetails;
+    }
+
 
     /**
      * @return string

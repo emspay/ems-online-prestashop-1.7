@@ -38,7 +38,7 @@ class GingerPlugin extends \PaymentModule
         $this->displayName = $this->l(GingerBankConfig::BANK_LABEL . ' ' . GingerBankConfig::GINGER_BANK_LABELS[$this->method_id]);
         $this->description = $this->l('Accept payments for your products using '. GingerBankConfig::GINGER_BANK_LABELS[$this->method_id]);
         $this->tab = 'payments_gateways';
-        $this->version = "1.4.1";
+        $this->version = "1.4.2";
         $this->author = 'Ginger Payments';
         $this->controllers = array('payment', 'validation');
         $this->is_eu_compatible = 1;
@@ -608,9 +608,8 @@ class GingerPlugin extends \PaymentModule
 
     private function validateCurrency($selectedCurrency)
     {
-
         try {
-            $gingerCurrencies = $this->gingerClient->getCurrencyList();
+            $gingerCurrencies = $this->getAllowedCurrencyList();
         }catch (\Exception $exception){
             $gingerCurrencies['payment_methods'][$this->method_id]['currencies'] = ['EUR'];
         }
@@ -622,6 +621,32 @@ class GingerPlugin extends \PaymentModule
 
         $supportedCurrencies = $gingerCurrencies['payment_methods'][$this->method_id]['currencies'];
         return true ? in_array($selectedCurrency,$supportedCurrencies) : false;
+    }
+
+    public function getAllowedCurrencyList()
+    {
+        if (file_exists(__DIR__."/../ginger_currency_list.json"))
+        {
+            $currencyList = json_decode(file_get_contents(__DIR__."/../ginger_currency_list.json"),true);
+            if ($currencyList['expired_time'] > time()) return $currencyList['currency_list'];
+        }
+
+        $allowed_currencies = $this->cacheCurrencyList();
+
+        return $allowed_currencies;
+    }
+
+
+    public function cacheCurrencyList()
+    {
+        $allowed_currencies = $this->gingerClient->getCurrencyList();
+        $currencyListWithExpiredTime = [
+            'currency_list' => $allowed_currencies,
+            'expired_time' => time() + (60*6)
+        ];
+        file_put_contents(__DIR__."/../ginger_currency_list.json", json_encode($currencyListWithExpiredTime));
+
+        return $allowed_currencies;
     }
 
     /**
