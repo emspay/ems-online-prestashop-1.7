@@ -2,3 +2,6 @@ emspaysofort
 emspayklarnadirectdebit
 emspaytikkiepaymentrequest
 emspaywechat
+emspayswish
+emspaymobilepay
+emspaygiropay
