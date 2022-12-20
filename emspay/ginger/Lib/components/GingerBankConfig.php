@@ -23,7 +23,10 @@ class GingerBankConfig
         'tikkie-payment-request' => 'Tikkie Payment Request',
         'sofort' => 'Sofort',
         'klarna-direct-debit' => 'Klarna Direct Debit',
-        'google-pay' => 'Google Pay'
+        'google-pay' => 'Google Pay',
+        'swish' => 'Swish',
+        'mobilepay' => 'MobilePay',
+        'giropay' => 'GiroPay'
     ];
 
     const PLUGIN_NAME = 'emspay-online-prestashop-1.7';
