@@ -72,3 +72,7 @@
 * Added possibility to skip the intermediate page with terms of condition in AfterPay
 * Removed unavailable payment methods
 * Added caching the array of currency
+
+** 1.4.3 **
+
+Added Swish, MobilePay, GiroPay
