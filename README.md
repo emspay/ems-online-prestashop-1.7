@@ -45,7 +45,7 @@ Click on the yellow button [Begin→]
 simply request your live account.
 
 ## Version number
-Version 1.4.3
+Version 1.4.4
 
 
 ## Pre-requisites to install the plug-ins: 

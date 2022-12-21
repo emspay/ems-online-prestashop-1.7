@@ -75,4 +75,8 @@
 
 ** 1.4.3 **
 
-Added Swish, MobilePay, GiroPay
+* Added Swish, MobilePay, GiroPay
+
+** 1.4.4 **
+
+* Fixed bug: User gets an error while installing plugin
