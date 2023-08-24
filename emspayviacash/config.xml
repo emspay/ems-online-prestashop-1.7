@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <module>
-    <name>emspayamex</name>
-    <displayName><![CDATA[EMS Online - American Express]]></displayName>
+    <name>emspayviacash</name>
+    <displayName><![CDATA[EMS Online - ViaCash]]></displayName>
     <version><![CDATA[1.4.5]]></version>
-    <description><![CDATA[Accept payments in your webshop using American Express.]]></description>
+    <description><![CDATA[Accept payments in your webshop using ViaCash.]]></description>
     <author><![CDATA[Ginger Payments]]></author>
     <tab><![CDATA[payments_gateways]]></tab>
 	<confirmUninstall><![CDATA[Are you sure about removing these details?]]></confirmUninstall>

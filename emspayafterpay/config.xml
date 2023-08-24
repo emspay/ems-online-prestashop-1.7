@@ -2,7 +2,7 @@
 <module>
     <name>emspayafterpay</name>
     <displayName><![CDATA[EMS Online - AfterPay]]></displayName>
-    <version><![CDATA[1.4.4]]></version>
+    <version><![CDATA[1.4.5]]></version>
     <description><![CDATA[Accept payments in your webshop using AfterPay.]]></description>
     <author><![CDATA[Ginger Payments]]></author>
     <tab><![CDATA[payments_gateways]]></tab>

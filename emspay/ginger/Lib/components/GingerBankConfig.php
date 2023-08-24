@@ -18,15 +18,14 @@ class GingerBankConfig
         'bank-transfer' => 'Bank Transfer',
         'credit-card' => 'Credit Card',
         'paypal' => 'PayPal',
-        'wechat' => 'WeChat',
         'payconiq' => 'Payconiq',
-        'tikkie-payment-request' => 'Tikkie Payment Request',
         'sofort' => 'Sofort',
         'klarna-direct-debit' => 'Klarna Direct Debit',
         'google-pay' => 'Google Pay',
         'swish' => 'Swish',
         'mobilepay' => 'MobilePay',
-        'giropay' => 'GiroPay'
+        'giropay' => 'GiroPay',
+        'viacash' => 'ViaCash'
     ];
 
     const PLUGIN_NAME = 'emspay-online-prestashop-1.7';
