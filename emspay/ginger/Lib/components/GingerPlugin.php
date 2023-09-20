@@ -39,7 +39,7 @@ class GingerPlugin extends \PaymentModule
         $this->displayName = $this->l(GingerBankConfig::BANK_LABEL . ' ' . GingerBankConfig::GINGER_BANK_LABELS[$this->method_id]);
         $this->description = $this->l('Accept payments for your products using '. GingerBankConfig::GINGER_BANK_LABELS[$this->method_id]);
         $this->tab = 'payments_gateways';
-        $this->version = "1.4.5";
+        $this->version = "1.4.6";
         $this->author = 'Ginger Payments';
         $this->controllers = array('payment', 'validation');
         $this->is_eu_compatible = 1;
@@ -207,7 +207,7 @@ class GingerPlugin extends \PaymentModule
 
         $paymentOption = new PaymentOption;
         $paymentOption->setCallToActionText($this->l('Pay by ' . GingerBankConfig::BANK_LABEL . ' ' . GingerBankConfig::GINGER_BANK_LABELS[$this->method_id]));
-        $paymentOption->setLogo(\Media::getMediaPath(__PS_BASE_URI__.'modules/' .$this->name. '/'.$this->name.'.png'));
+        $paymentOption->setLogo(\Media::getMediaPath(__PS_BASE_URI__.'modules/' .$this->name. '/'.$this->name.'.svg'));
         $paymentOption->setAction($this->context->link->getModuleLink($this->name, 'payment'));
         $paymentOption->setModuleName($this->name);
 
