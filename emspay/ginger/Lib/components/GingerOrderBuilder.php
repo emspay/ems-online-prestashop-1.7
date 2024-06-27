@@ -2,7 +2,6 @@
 namespace Lib\components;
 
 use Lib\interfaces\GingerTermsAndConditions;
-use Lib\interfaces\GingerIssuers;
 
 class GingerOrderBuilder
 {
@@ -186,9 +185,13 @@ class GingerOrderBuilder
     {
         return [
             array_filter(array(
-                'address' => $this->getAddress(),
+                'address' => implode("\n", array_filter(array(
+                    $this->getFirstAddress(),
+                    $this->getSecondAddress()." ".$this->getCity()
+                ))),
                 'address_type' => 'billing',
-                'country' => $this->getCountry()
+                'country' => $this->getCountry(),
+                'postal_code' => $this->getPostCode()
             ))];
     }
     /**
@@ -294,13 +297,6 @@ class GingerOrderBuilder
     public function getPaymentMethodDetails(): array
     {
         $paymentMethodDetails = [];
-
-        //uses for ideal
-        if ($this->paymentMethod instanceof GingerIssuers)
-        {
-            $paymentMethodDetails['issuer_id'] = $this->getSelectedIssuer();
-            return $paymentMethodDetails;
-        }
 
         //uses for afterpay
         if ($this->paymentMethod instanceof GingerTermsAndConditions)

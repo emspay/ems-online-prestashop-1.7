@@ -6,7 +6,6 @@ use Lib\interfaces\GingerCountryValidation;
 use Lib\interfaces\GingerCustomFieldsOnCheckout;
 use Lib\interfaces\GingerIdentificationPay;
 use Lib\interfaces\GingerIPValidation;
-use Lib\interfaces\GingerIssuers;
 use Lib\banktwins\GingerBankOrderBuilder;
 use Lib\banktwins\GingerBankClientBuilder;
 use Model\Ginger;
@@ -39,7 +38,7 @@ class GingerPlugin extends \PaymentModule
         $this->displayName = $this->l(GingerBankConfig::BANK_LABEL . ' ' . GingerBankConfig::GINGER_BANK_LABELS[$this->method_id]);
         $this->description = $this->l('Accept payments for your products using '. GingerBankConfig::GINGER_BANK_LABELS[$this->method_id]);
         $this->tab = 'payments_gateways';
-        $this->version = "1.4.6";
+        $this->version = "1.4.7";
         $this->author = 'Ginger Payments';
         $this->controllers = array('payment', 'validation');
         $this->is_eu_compatible = 1;
@@ -201,7 +200,6 @@ class GingerPlugin extends \PaymentModule
                 'this_path' => $this->_path,
                 'this_path_bw' => $this->_path,
                 'this_path_ssl' => \Tools::getShopDomainSsl(true, true).__PS_BASE_URI__.'modules/'.$this->name.'/',
-                'issuers' => ($this instanceof GingerIssuers) ? $this->_getIssuers() : null,
             ])
         );
 

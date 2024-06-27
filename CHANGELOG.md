@@ -84,3 +84,11 @@
 ** 1.4.5 **
 
 * Added ViaCash
+
+** 1.4.6 **
+
+* Updated payment method icons
+
+** 1.4.7 **
+
+* Removed select with ideal issuers
