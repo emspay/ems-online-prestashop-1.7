@@ -9,15 +9,14 @@ if (!defined('_PS_VERSION_')) {
 
 require_once(\_PS_MODULE_DIR_ . 'emspay/ginger/vendor/autoload.php');
 
-class emspayideal extends GingerBankGateway
+class emspaysofort extends GingerBankGateway
 {
     use GingerInstallTrait;
 
     public function __construct()
     {
-        $this->name = 'emspayideal';
-	    $this->method_id = 'ideal';
+        $this->name = 'emspaysofort';
+	    $this->method_id = 'sofort';
         parent::__construct();
     }
-
 }

@@ -1,6 +1,7 @@
 <?php
 
 use Lib\banktwins\GingerBankGateway;
+use Lib\interfaces\GingerCapturable;
 use Lib\components\GingerInstallTrait;
 
 if (!defined('_PS_VERSION_')) {
@@ -9,15 +10,15 @@ if (!defined('_PS_VERSION_')) {
 
 require_once(\_PS_MODULE_DIR_ . 'emspay/ginger/vendor/autoload.php');
 
-class emspayideal extends GingerBankGateway
+
+class emspayKlarnaDirectDebit extends GingerBankGateway implements GingerCapturable
 {
     use GingerInstallTrait;
-
     public function __construct()
     {
-        $this->name = 'emspayideal';
-	    $this->method_id = 'ideal';
+        $this->name = 'emspayklarnadirectdebit';
+	    $this->method_id = 'klarna-direct-debit';
+        $this->useDemoApiKey = true;
         parent::__construct();
     }
-
 }

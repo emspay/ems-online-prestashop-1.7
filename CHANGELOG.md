@@ -92,3 +92,7 @@
 ** 1.4.7 **
 
 * Removed select with ideal issuers
+
+** 1.4.8 **
+
+* Fixed Issue: User can’t proceed payment with Ideal Payment Method
